@@ -9,7 +9,7 @@
 ## 🔍 Сканирование
 
 ```bash
-nmap -sC -sV -oN scans/nmap.txt <IP>
+nmap -sC -sV -oN scans/nmap.txt $ip
 ```
 
 🖼️ Nmap скан:
@@ -17,6 +17,8 @@ nmap -sC -sV -oN scans/nmap.txt <IP>
 ![nmap scan](screenshots/nmap_scan.png)
 
 ---
+
+## 🧱 Обход Firewall
 
 ## 📂 Получение доступа
 
