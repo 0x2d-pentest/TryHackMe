@@ -47,7 +47,7 @@ cat << EOF > writeup.md
 
 ---
 
-## shugar
+## Sugar
 
 \`\`\`bash
 nmap_ctf() {
