@@ -375,14 +375,10 @@ Process List
  1268  716   spoolsv.exe         x64   0        NT AUTHORITY\SYSTEM           C:\Windows\System32\spoolsv.exe
  1328  1268  cmd.exe             x64   0        NT AUTHORITY\SYSTEM           C:\Windows\System32\cmd.exe
  1372  716   svchost.exe         x64   0        NT AUTHORITY\LOCAL SERVICE
- 1452  716   amazon-ssm-agent.e  x64   0        NT AUTHORITY\SYSTEM           C:\Program Files\Amazon\SSM\amazon-
-             xe                                                               ssm-agent.exe
- 1532  716   LiteAgent.exe       x64   0        NT AUTHORITY\SYSTEM           C:\Program Files\Amazon\XenTools\Li
-                                                                              teAgent.exe
- 1620  1292  powershell.exe      x64   0        NT AUTHORITY\SYSTEM           C:\Windows\System32\WindowsPowerShe
-                                                                              ll\v1.0\powershell.exe
- 1688  716   Ec2Config.exe       x64   0        NT AUTHORITY\SYSTEM           C:\Program Files\Amazon\Ec2ConfigSe
-                                                                              rvice\Ec2Config.exe
+ 1452  716   amazon-ssm-agent.e  x64   0        NT AUTHORITY\SYSTEM           C:\Program Files\Amazon\SSM\amazon-ssm-agent.exe
+ 1532  716   LiteAgent.exe       x64   0        NT AUTHORITY\SYSTEM           C:\Program Files\Amazon\XenTools\LiteAgent.exe
+ 1620  1292  powershell.exe      x64   0        NT AUTHORITY\SYSTEM           C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+ 1688  716   Ec2Config.exe       x64   0        NT AUTHORITY\SYSTEM           C:\Program Files\Amazon\Ec2ConfigService\Ec2Config.exe
  1984  716   svchost.exe         x64   0        NT AUTHORITY\NETWORK SERVICE
  2080  844   WmiPrvSE.exe
  2228  568   conhost.exe         x64   0        NT AUTHORITY\SYSTEM           C:\Windows\system32\conhost.exe
