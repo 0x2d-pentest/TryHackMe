@@ -1,0 +1,95 @@
+# Nmap 7.94SVN scan initiated Wed Jul  2 08:21:06 2025 as: /usr/lib/nmap/nmap -sT -Pn -sV -T4 -A -v -p 21,22,80,111,139,445,2049,35103,37029,43895,58605 -oN nmap-sV.txt 10.10.168.236
+Nmap scan report for 10.10.168.236
+Host is up (0.21s latency).
+
+PORT      STATE SERVICE     VERSION
+21/tcp    open  ftp         ProFTPD 1.3.5
+22/tcp    open  ssh         OpenSSH 7.2p2 Ubuntu 4ubuntu2.7 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 b3:ad:83:41:49:e9:5d:16:8d:3b:0f:05:7b:e2:c0:ae (RSA)
+|   256 f8:27:7d:64:29:97:e6:f8:65:54:65:22:f7:c8:1d:8a (ECDSA)
+|_  256 5a:06:ed:eb:b6:56:7e:4c:01:dd:ea:bc:ba:fa:33:79 (ED25519)
+80/tcp    open  http        Apache httpd 2.4.18 ((Ubuntu))
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-title: Site doesn't have a title (text/html).
+| http-robots.txt: 1 disallowed entry 
+|_/admin.html
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+111/tcp   open  rpcbind     2-4 (RPC #100000)
+| rpcinfo: 
+|   program version    port/proto  service
+|   100000  2,3,4        111/tcp   rpcbind
+|   100000  2,3,4        111/udp   rpcbind
+|   100000  3,4          111/tcp6  rpcbind
+|   100000  3,4          111/udp6  rpcbind
+|   100003  2,3,4       2049/tcp   nfs
+|   100003  2,3,4       2049/tcp6  nfs
+|   100003  2,3,4       2049/udp   nfs
+|   100003  2,3,4       2049/udp6  nfs
+|   100005  1,2,3      43403/tcp6  mountd
+|   100005  1,2,3      43895/tcp   mountd
+|   100005  1,2,3      48963/udp   mountd
+|   100005  1,2,3      58565/udp6  mountd
+|   100021  1,3,4      34435/tcp6  nlockmgr
+|   100021  1,3,4      35103/tcp   nlockmgr
+|   100021  1,3,4      46780/udp6  nlockmgr
+|   100021  1,3,4      59879/udp   nlockmgr
+|   100227  2,3         2049/tcp   nfs_acl
+|   100227  2,3         2049/tcp6  nfs_acl
+|   100227  2,3         2049/udp   nfs_acl
+|_  100227  2,3         2049/udp6  nfs_acl
+139/tcp   open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+445/tcp   open  netbios-ssn Samba smbd 4.3.11-Ubuntu (workgroup: WORKGROUP)
+2049/tcp  open  nfs         2-4 (RPC #100003)
+35103/tcp open  nlockmgr    1-4 (RPC #100021)
+37029/tcp open  mountd      1-3 (RPC #100005)
+43895/tcp open  mountd      1-3 (RPC #100005)
+58605/tcp open  mountd      1-3 (RPC #100005)
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Aggressive OS guesses: Linux 3.10 - 3.13 (96%), Linux 5.4 (96%), ASUS RT-N56U WAP (Linux 3.4) (95%), Linux 3.16 (95%), Linux 3.1 (93%), Linux 3.2 (93%), AXIS 210A or 211 Network Camera (Linux 2.6.17) (93%), Sony Android TV (Android 5.0) (93%), Android 5.0 - 6.0.1 (Linux 3.4) (93%), Android 5.1 (93%)
+No exact OS matches for host (test conditions non-ideal).
+Uptime guess: 0.013 days (since Wed Jul  2 08:02:25 2025)
+Network Distance: 2 hops
+TCP Sequence Prediction: Difficulty=257 (Good luck!)
+IP ID Sequence Generation: All zeros
+Service Info: Host: KENOBI; OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+| smb-os-discovery: 
+|   OS: Windows 6.1 (Samba 4.3.11-Ubuntu)
+|   Computer name: kenobi
+|   NetBIOS computer name: KENOBI\x00
+|   Domain name: \x00
+|   FQDN: kenobi
+|_  System time: 2025-07-02T07:21:26-05:00
+|_clock-skew: mean: 1h40m00s, deviation: 2h53m12s, median: 0s
+| smb2-time: 
+|   date: 2025-07-02T12:21:26
+|_  start_date: N/A
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| nbstat: NetBIOS name: KENOBI, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+| Names:
+|   KENOBI<00>           Flags: <unique><active>
+|   KENOBI<03>           Flags: <unique><active>
+|   KENOBI<20>           Flags: <unique><active>
+|   \x01\x02__MSBROWSE__\x02<01>  Flags: <group><active>
+|   WORKGROUP<00>        Flags: <group><active>
+|   WORKGROUP<1d>        Flags: <unique><active>
+|_  WORKGROUP<1e>        Flags: <group><active>
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT       ADDRESS
+1   214.26 ms 10.21.0.1
+2   214.39 ms 10.10.168.236
+
+Read data files from: /usr/share/nmap
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Jul  2 08:21:33 2025 -- 1 IP address (1 host up) scanned in 27.52 seconds
