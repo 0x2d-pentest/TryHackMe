@@ -1,0 +1,64 @@
+# Nmap 7.94SVN scan initiated Wed Jul  2 03:04:57 2025 as: /usr/lib/nmap/nmap --privileged -sT -Pn -sC -v -p 135,139,445,3389,49152,49153,49154,49158,49159 -oN nmap-sC.txt 10.10.67.181
+Nmap scan report for 10.10.67.181
+Host is up (0.22s latency).
+
+PORT      STATE SERVICE
+135/tcp   open  msrpc
+139/tcp   open  netbios-ssn
+445/tcp   open  microsoft-ds
+3389/tcp  open  ms-wbt-server
+|_ssl-date: 2025-07-02T07:04:59+00:00; +1s from scanner time.
+| rdp-ntlm-info: 
+|   Target_Name: JON-PC
+|   NetBIOS_Domain_Name: JON-PC
+|   NetBIOS_Computer_Name: JON-PC
+|   DNS_Domain_Name: Jon-PC
+|   DNS_Computer_Name: Jon-PC
+|   Product_Version: 6.1.7601
+|_  System_Time: 2025-07-02T07:05:00+00:00
+| ssl-cert: Subject: commonName=Jon-PC
+| Issuer: commonName=Jon-PC
+| Public Key type: rsa
+| Public Key bits: 2048
+| Signature Algorithm: sha1WithRSAEncryption
+| Not valid before: 2025-07-01T06:15:55
+| Not valid after:  2025-12-31T06:15:55
+| MD5:   5efc:17c7:668f:3060:c943:4810:6b45:176e
+|_SHA-1: bedb:d858:6243:6287:f6f6:60e4:4c31:d1b6:f4e5:ea6c
+49152/tcp open  unknown
+49153/tcp open  unknown
+49154/tcp open  unknown
+49158/tcp open  unknown
+49159/tcp open  unknown
+
+Host script results:
+| smb2-security-mode: 
+|   2:1:0: 
+|_    Message signing enabled but not required
+| nbstat: NetBIOS name: JON-PC, NetBIOS user: <unknown>, NetBIOS MAC: 02:84:2f:5f:ff:af (unknown)
+| Names:
+|   JON-PC<00>           Flags: <unique><active>
+|   WORKGROUP<00>        Flags: <group><active>
+|   JON-PC<20>           Flags: <unique><active>
+|   WORKGROUP<1e>        Flags: <group><active>
+|   WORKGROUP<1d>        Flags: <unique><active>
+|_  \x01\x02__MSBROWSE__\x02<01>  Flags: <group><active>
+| smb2-time: 
+|   date: 2025-07-02T07:04:59
+|_  start_date: 2025-07-02T06:15:53
+| smb-os-discovery: 
+|   OS: Windows 7 Professional 7601 Service Pack 1 (Windows 7 Professional 6.1)
+|   OS CPE: cpe:/o:microsoft:windows_7::sp1:professional
+|   Computer name: Jon-PC
+|   NetBIOS computer name: JON-PC\x00
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2025-07-02T02:04:59-05:00
+|_clock-skew: mean: 1h00m00s, deviation: 2h14m10s, median: 0s
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+
+Read data files from: /usr/share/nmap
+# Nmap done at Wed Jul  2 03:06:20 2025 -- 1 IP address (1 host up) scanned in 83.34 seconds
