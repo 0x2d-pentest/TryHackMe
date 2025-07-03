@@ -1,4 +1,4 @@
-# VulnHub - Vulnversity
+# TryHackMe - Vulnversity
 
 📅 Дата: 2025-07-01  
 🧠 Сложность:  easy  
