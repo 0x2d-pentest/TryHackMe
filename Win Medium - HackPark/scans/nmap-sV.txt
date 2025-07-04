@@ -1,0 +1,49 @@
+# Nmap 7.94SVN scan initiated Fri Jul  4 05:17:56 2025 as: /usr/lib/nmap/nmap -sT -Pn -sV -T4 -A -v -p 80,3389 -oN nmap-sV.txt 10.10.53.26
+Nmap scan report for 10.10.53.26
+Host is up (0.21s latency).
+
+PORT     STATE SERVICE            VERSION
+80/tcp   open  http               Microsoft IIS httpd 8.5
+|_http-title: hackpark | hackpark amusements
+| http-methods: 
+|   Supported Methods: GET HEAD OPTIONS TRACE POST
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/8.5
+| http-robots.txt: 6 disallowed entries 
+| /Account/*.* /search /search.aspx /error404.aspx 
+|_/archive /archive.aspx
+3389/tcp open  ssl/ms-wbt-server?
+| ssl-cert: Subject: commonName=hackpark
+| Issuer: commonName=hackpark
+| Public Key type: rsa
+| Public Key bits: 2048
+| Signature Algorithm: sha1WithRSAEncryption
+| Not valid before: 2025-07-03T09:05:56
+| Not valid after:  2026-01-02T09:05:56
+| MD5:   1833:f9a1:7702:db27:fe1c:8dba:9fc6:865d
+|_SHA-1: 7a88:0c48:18aa:4533:f156:db6e:54d3:df39:08c0:ae09
+|_ssl-date: 2025-07-04T09:19:49+00:00; 0s from scanner time.
+| rdp-ntlm-info: 
+|   Target_Name: HACKPARK
+|   NetBIOS_Domain_Name: HACKPARK
+|   NetBIOS_Computer_Name: HACKPARK
+|   DNS_Domain_Name: hackpark
+|   DNS_Computer_Name: hackpark
+|   Product_Version: 6.3.9600
+|_  System_Time: 2025-07-04T09:19:44+00:00
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+OS fingerprint not ideal because: Missing a closed TCP port so results incomplete
+No OS matches for host
+Uptime guess: 0.010 days (since Fri Jul  4 05:05:03 2025)
+TCP Sequence Prediction: Difficulty=263 (Good luck!)
+IP ID Sequence Generation: Incremental
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT       ADDRESS
+1   210.32 ms 10.21.0.1
+2   ... 30
+
+Read data files from: /usr/share/nmap
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Fri Jul  4 05:19:50 2025 -- 1 IP address (1 host up) scanned in 113.71 seconds
