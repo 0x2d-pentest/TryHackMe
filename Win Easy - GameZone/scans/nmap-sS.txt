@@ -1,0 +1,10 @@
+# Nmap 7.94SVN scan initiated Fri Jul  4 21:38:58 2025 as: /usr/lib/nmap/nmap -sS -p- -Pn --max-parallelism 100 --min-rate 1000 -v -oN nmap-sS.txt 10.10.220.157
+Nmap scan report for 10.10.220.157
+Host is up (0.24s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+
+Read data files from: /usr/share/nmap
+# Nmap done at Fri Jul  4 21:40:10 2025 -- 1 IP address (1 host up) scanned in 71.82 seconds
