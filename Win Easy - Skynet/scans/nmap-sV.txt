@@ -1,0 +1,68 @@
+# Nmap 7.94SVN scan initiated Sun Jul  6 22:24:35 2025 as: /usr/lib/nmap/nmap -sT -Pn -sV -T4 -A -v -p 22,80,110,139,143,445 -oN nmap-sV.txt 10.10.60.59
+Nmap scan report for 10.10.60.59
+Host is up (0.22s latency).
+
+PORT    STATE SERVICE     VERSION
+22/tcp  open  ssh         OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 99:23:31:bb:b1:e9:43:b7:56:94:4c:b9:e8:21:46:c5 (RSA)
+|   256 57:c0:75:02:71:2d:19:31:83:db:e4:fe:67:96:68:cf (ECDSA)
+|_  256 46:fa:4e:fc:10:a5:4f:57:57:d0:6d:54:f6:c3:4d:fe (ED25519)
+80/tcp  open  http        Apache httpd 2.4.18 ((Ubuntu))
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Skynet
+110/tcp open  pop3        Dovecot pop3d
+|_pop3-capabilities: RESP-CODES TOP PIPELINING CAPA UIDL SASL AUTH-RESP-CODE
+139/tcp open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+143/tcp open  imap        Dovecot imapd
+|_imap-capabilities: LITERAL+ capabilities more listed have post-login Pre-login IMAP4rev1 LOGIN-REFERRALS OK ID LOGINDISABLEDA0001 ENABLE IDLE SASL-IR
+445/tcp open  netbios-ssn Samba smbd 4.3.11-Ubuntu (workgroup: WORKGROUP)
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Aggressive OS guesses: Linux 5.4 (96%), Linux 3.10 - 3.13 (95%), ASUS RT-N56U WAP (Linux 3.4) (95%), Linux 3.16 (95%), Linux 3.1 (93%), Linux 3.2 (93%), AXIS 210A or 211 Network Camera (Linux 2.6.17) (93%), Sony Android TV (Android 5.0) (93%), Android 7.1.1 - 7.1.2 (93%), Linux 3.13 - 4.4 (93%)
+No exact OS matches for host (test conditions non-ideal).
+Uptime guess: 0.001 days (since Sun Jul  6 22:23:31 2025)
+Network Distance: 2 hops
+TCP Sequence Prediction: Difficulty=250 (Good luck!)
+IP ID Sequence Generation: All zeros
+Service Info: Host: SKYNET; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+| smb-os-discovery: 
+|   OS: Windows 6.1 (Samba 4.3.11-Ubuntu)
+|   Computer name: skynet
+|   NetBIOS computer name: SKYNET\x00
+|   Domain name: \x00
+|   FQDN: skynet
+|_  System time: 2025-07-06T21:25:06-05:00
+|_clock-skew: mean: 1h40m00s, deviation: 2h53m13s, median: 0s
+| nbstat: NetBIOS name: SKYNET, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+| Names:
+|   SKYNET<00>           Flags: <unique><active>
+|   SKYNET<03>           Flags: <unique><active>
+|   SKYNET<20>           Flags: <unique><active>
+|   \x01\x02__MSBROWSE__\x02<01>  Flags: <group><active>
+|   WORKGROUP<00>        Flags: <group><active>
+|   WORKGROUP<1d>        Flags: <unique><active>
+|_  WORKGROUP<1e>        Flags: <group><active>
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2025-07-07T02:25:06
+|_  start_date: N/A
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT       ADDRESS
+1   220.57 ms 10.21.0.1
+2   220.74 ms 10.10.60.59
+
+Read data files from: /usr/share/nmap
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sun Jul  6 22:25:15 2025 -- 1 IP address (1 host up) scanned in 40.46 seconds

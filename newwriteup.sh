@@ -52,7 +52,7 @@ cat << EOF > writeup.md
 \`\`\`bash
 nmap_ctf() {
   local ip=\$1
-  sudo nmap -sS -p- -n --max-parallelism 100 --min-rate 1000 -v -oN nmap-sS.txt \$ip && nmap -sT -Pn -sV -T4 -A -v -p "\$(grep -oP \"^[0-9]+(?=/tcp\\s+open)\" nmap-sS.txt | sort -n | paste -sd \",\")" -oN nmap-sV.txt \$ip
+  sudo nmap -sS -p- -Pn --max-parallelism 100 --min-rate 1000 -v -oN nmap-sS.txt \$ip && nmap -sT -Pn -sV -T4 -A -v -p "\$(grep -oP \"^[0-9]+(?=/tcp\\s+open)\" nmap-sS.txt | sort -n | paste -sd \",\")" -oN nmap-sV.txt \$ip
 }
 \`\`\`
 
@@ -63,7 +63,7 @@ nmap_ctf() {
 export ip=$IP && nmap_ctf \$ip
 \`\`\`
 
-🖼️ Nmap скан:
+### nmap
 
 ![nmap scan](screenshots/nmap_scan.png)
 
