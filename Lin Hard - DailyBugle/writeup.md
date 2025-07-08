@@ -312,7 +312,7 @@ User jjameson may run the following commands on dailybugle:
     (ALL) NOPASSWD: /usr/bin/yum
 ```
 
-Эксплуатация описана тут: `https://gtfobins.github.io/gtfobins/yum/`
+Эксплуатация описана тут: `https://gtfobins.github.io/gtfobins/yum/`  
 В данном случае нужно это:
 ```
 TF=$(mktemp -d)
