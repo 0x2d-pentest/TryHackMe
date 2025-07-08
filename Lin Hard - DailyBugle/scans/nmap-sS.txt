@@ -1,0 +1,11 @@
+# Nmap 7.94SVN scan initiated Mon Jul  7 05:55:26 2025 as: /usr/lib/nmap/nmap -sS -p- -Pn --max-parallelism 100 --min-rate 1000 -v -oN nmap-sS.txt 10.10.172.90
+Nmap scan report for 10.10.172.90
+Host is up (0.22s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+3306/tcp open  mysql
+
+Read data files from: /usr/share/nmap
+# Nmap done at Mon Jul  7 05:56:50 2025 -- 1 IP address (1 host up) scanned in 83.43 seconds
