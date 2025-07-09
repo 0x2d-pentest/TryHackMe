@@ -1,0 +1,16 @@
+# Nmap 7.94SVN scan initiated Tue Jul  8 22:27:09 2025 as: /usr/lib/nmap/nmap -sS -p- -Pn --max-parallelism 100 --min-rate 1000 -v -oN nmap-sS.txt 10.10.206.232
+Nmap scan report for 10.10.206.232
+Host is up (0.22s latency).
+Not shown: 65527 filtered tcp ports (no-response)
+PORT      STATE SERVICE
+80/tcp    open  http
+135/tcp   open  msrpc
+139/tcp   open  netbios-ssn
+445/tcp   open  microsoft-ds
+3389/tcp  open  ms-wbt-server
+49663/tcp open  unknown
+49666/tcp open  unknown
+49667/tcp open  unknown
+
+Read data files from: /usr/share/nmap
+# Nmap done at Tue Jul  8 22:29:26 2025 -- 1 IP address (1 host up) scanned in 137.25 seconds
