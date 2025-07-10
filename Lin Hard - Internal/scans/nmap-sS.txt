@@ -1,0 +1,11 @@
+# Nmap 7.94SVN scan initiated Wed Jul  9 21:47:02 2025 as: /usr/lib/nmap/nmap -sS -p- -Pn --max-parallelism 100 --min-rate 1000 -v -oN nmap-sS.txt 10.10.123.74
+Increasing send delay for 10.10.123.74 from 5 to 10 due to 99 out of 328 dropped probes since last increase.
+Nmap scan report for internal.thm (10.10.123.74)
+Host is up (0.86s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+
+Read data files from: /usr/share/nmap
+# Nmap done at Wed Jul  9 21:48:16 2025 -- 1 IP address (1 host up) scanned in 74.04 seconds
