@@ -6,7 +6,7 @@
 
 ---
 
-## Sugar
+### Sugar
 
 ```bash
 nmap_ctf() {
