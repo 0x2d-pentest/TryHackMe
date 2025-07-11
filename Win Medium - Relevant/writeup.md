@@ -14,14 +14,14 @@ nmap_ctf() {
   sudo nmap -sS -p- -Pn --max-parallelism 100 --min-rate 1000 -v -oN nmap-sS.txt $ip && nmap -sT -Pn -sV -T4 -A -v -p "$(grep -oP \"^[0-9]+(?=/tcp\s+open)\" nmap-sS.txt | sort -n | paste -sd \",\")" -oN nmap-sV.txt $ip
 }
 ```
-
-
+  
+  
 ## 🔍 Сканирование
-
+  
 ```bash
 export ip=10.10.254.155св && nmap_ctf $ip
 ```
-
+  
 ### nmap
 ```bash
 PORT      STATE SERVICE       VERSION
@@ -93,13 +93,14 @@ Host script results:
 |_  message_signing: disabled (dangerous, but default)
 |_clock-skew: mean: 1h24m01s, deviation: 3h07m51s, median: 0s
 ```
-
+  
 ---
-
+  
+  
 ## 🕵️ Enumeration
-
+  
 ### smb
-
+  
 Есть уязвимости smb
 ```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Relevant/scans]
