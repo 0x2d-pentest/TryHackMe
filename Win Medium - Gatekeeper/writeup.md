@@ -150,7 +150,7 @@ Host script results:
 |_  System time: 2025-07-24T09:03:58-04:00
 |_clock-skew: mean: 1h00m01s, deviation: 2h00m01s, median: 0s
 ```
-![nmap scan](screenshots/nmap_scan.png)
+
 
 ---
 
