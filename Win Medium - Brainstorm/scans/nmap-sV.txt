@@ -1,0 +1,92 @@
+# Nmap 7.94SVN scan initiated Wed Jul 23 08:45:45 2025 as: /usr/lib/nmap/nmap -sT -Pn -sV -T4 -A -v -p 21,3389,9999 -oN nmap-sV.txt 10.10.206.118
+Nmap scan report for 10.10.206.118
+Host is up (0.22s latency).
+
+PORT     STATE SERVICE            VERSION
+21/tcp   open  ftp                Microsoft ftpd
+| ftp-syst: 
+|_  SYST: Windows_NT
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_Can't get directory listing: TIMEOUT
+3389/tcp open  ssl/ms-wbt-server?
+|_ssl-date: 2025-07-23T12:49:18+00:00; +1s from scanner time.
+| ssl-cert: Subject: commonName=brainstorm
+| Issuer: commonName=brainstorm
+| Public Key type: rsa
+| Public Key bits: 2048
+| Signature Algorithm: sha1WithRSAEncryption
+| Not valid before: 2025-07-22T12:27:55
+| Not valid after:  2026-01-21T12:27:55
+| MD5:   e48d:29db:a794:ae6b:e58a:83f4:9e02:7a84
+|_SHA-1: 5382:63ad:2a30:2735:c33b:1e13:a599:f9f8:5ce5:9fcb
+| rdp-ntlm-info: 
+|   Target_Name: BRAINSTORM
+|   NetBIOS_Domain_Name: BRAINSTORM
+|   NetBIOS_Computer_Name: BRAINSTORM
+|   DNS_Domain_Name: brainstorm
+|   DNS_Computer_Name: brainstorm
+|   Product_Version: 6.1.7601
+|_  System_Time: 2025-07-23T12:48:48+00:00
+9999/tcp open  abyss?
+| fingerprint-strings: 
+|   DNSStatusRequestTCP, DNSVersionBindReqTCP, FourOhFourRequest, GenericLines, GetRequest, HTTPOptions, Help, JavaRMI, RPCCheck, RTSPRequest, SSLSessionReq, TerminalServerCookie: 
+|     Welcome to Brainstorm chat (beta)
+|     Please enter your username (max 20 characters): Write a message:
+|   NULL: 
+|     Welcome to Brainstorm chat (beta)
+|_    Please enter your username (max 20 characters):
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port9999-TCP:V=7.94SVN%I=7%D=7/23%Time=6880D981%P=x86_64-pc-linux-gnu%r
+SF:(NULL,52,"Welcome\x20to\x20Brainstorm\x20chat\x20\(beta\)\nPlease\x20en
+SF:ter\x20your\x20username\x20\(max\x2020\x20characters\):\x20")%r(GetRequ
+SF:est,63,"Welcome\x20to\x20Brainstorm\x20chat\x20\(beta\)\nPlease\x20ente
+SF:r\x20your\x20username\x20\(max\x2020\x20characters\):\x20Write\x20a\x20
+SF:message:\x20")%r(HTTPOptions,63,"Welcome\x20to\x20Brainstorm\x20chat\x2
+SF:0\(beta\)\nPlease\x20enter\x20your\x20username\x20\(max\x2020\x20charac
+SF:ters\):\x20Write\x20a\x20message:\x20")%r(FourOhFourRequest,63,"Welcome
+SF:\x20to\x20Brainstorm\x20chat\x20\(beta\)\nPlease\x20enter\x20your\x20us
+SF:ername\x20\(max\x2020\x20characters\):\x20Write\x20a\x20message:\x20")%
+SF:r(JavaRMI,63,"Welcome\x20to\x20Brainstorm\x20chat\x20\(beta\)\nPlease\x
+SF:20enter\x20your\x20username\x20\(max\x2020\x20characters\):\x20Write\x2
+SF:0a\x20message:\x20")%r(GenericLines,63,"Welcome\x20to\x20Brainstorm\x20
+SF:chat\x20\(beta\)\nPlease\x20enter\x20your\x20username\x20\(max\x2020\x2
+SF:0characters\):\x20Write\x20a\x20message:\x20")%r(RTSPRequest,63,"Welcom
+SF:e\x20to\x20Brainstorm\x20chat\x20\(beta\)\nPlease\x20enter\x20your\x20u
+SF:sername\x20\(max\x2020\x20characters\):\x20Write\x20a\x20message:\x20")
+SF:%r(RPCCheck,63,"Welcome\x20to\x20Brainstorm\x20chat\x20\(beta\)\nPlease
+SF:\x20enter\x20your\x20username\x20\(max\x2020\x20characters\):\x20Write\
+SF:x20a\x20message:\x20")%r(DNSVersionBindReqTCP,63,"Welcome\x20to\x20Brai
+SF:nstorm\x20chat\x20\(beta\)\nPlease\x20enter\x20your\x20username\x20\(ma
+SF:x\x2020\x20characters\):\x20Write\x20a\x20message:\x20")%r(DNSStatusReq
+SF:uestTCP,63,"Welcome\x20to\x20Brainstorm\x20chat\x20\(beta\)\nPlease\x20
+SF:enter\x20your\x20username\x20\(max\x2020\x20characters\):\x20Write\x20a
+SF:\x20message:\x20")%r(Help,63,"Welcome\x20to\x20Brainstorm\x20chat\x20\(
+SF:beta\)\nPlease\x20enter\x20your\x20username\x20\(max\x2020\x20character
+SF:s\):\x20Write\x20a\x20message:\x20")%r(SSLSessionReq,63,"Welcome\x20to\
+SF:x20Brainstorm\x20chat\x20\(beta\)\nPlease\x20enter\x20your\x20username\
+SF:x20\(max\x2020\x20characters\):\x20Write\x20a\x20message:\x20")%r(Termi
+SF:nalServerCookie,63,"Welcome\x20to\x20Brainstorm\x20chat\x20\(beta\)\nPl
+SF:ease\x20enter\x20your\x20username\x20\(max\x2020\x20characters\):\x20Wr
+SF:ite\x20a\x20message:\x20");
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose|phone|specialized
+Running (JUST GUESSING): Microsoft Windows 2008|7|Phone|8.1 (88%)
+OS CPE: cpe:/o:microsoft:windows_server_2008:r2:sp1 cpe:/o:microsoft:windows_8 cpe:/o:microsoft:windows_7::sp1 cpe:/o:microsoft:windows cpe:/o:microsoft:windows_7 cpe:/o:microsoft:windows_8.1:r1
+Aggressive OS guesses: Microsoft Windows Server 2008 R2 SP1 (88%), Microsoft Windows Server 2008 (87%), Microsoft Windows Server 2008 R2 (87%), Microsoft Windows Server 2008 R2 or Windows 8 (87%), Microsoft Windows 7 SP1 (87%), Microsoft Windows 8.1 Update 1 (87%), Microsoft Windows Phone 7.5 or 8.0 (87%), Microsoft Windows Embedded Standard 7 (86%), Microsoft Windows 8.1 R1 (85%)
+No exact OS matches for host (test conditions non-ideal).
+Uptime guess: 0.016 days (since Wed Jul 23 08:25:43 2025)
+TCP Sequence Prediction: Difficulty=265 (Good luck!)
+IP ID Sequence Generation: Incremental
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 1s, deviation: 0s, median: 0s
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT       ADDRESS
+1   216.12 ms 10.21.0.1
+2   ... 30
+
+Read data files from: /usr/share/nmap
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Jul 23 08:49:19 2025 -- 1 IP address (1 host up) scanned in 214.04 seconds
