@@ -433,7 +433,7 @@ if __name__ == '__main__':
     get_offset()
 ```
 
-И снова запускаю скрипт
+И снова запускаю скрипт и получаю `offset` `2012`
 ```bash
 ┌──(.venv)─(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Brainstorm/exploits]
 └─$ python3 x.py
