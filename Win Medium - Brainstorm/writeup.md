@@ -575,7 +575,8 @@ Write a message:
 !mona compare -f "c:\mona\chatserver\bytearray.bin" -a 0204EEC0
 ```
 <img width="376" height="325" alt="image" src="https://github.com/user-attachments/assets/ea9e90a6-6afa-46c4-ad45-db251f52155a" />  
-Кроме `x00` бэдчаров нет.  
+
+- Кроме `x00` бэдчаров нет.  
   
 Далее нужно найти функцию для вызова кода из стека в `essfunc.dll`  
 Для этого использую `ROPgadget`  
